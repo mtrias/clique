@@ -14,8 +14,9 @@ Agregar:
 - tamaños:
   - nodo_size <- 11
   - fuante_size <- 11
-
 - Resultado: Proceso terminado sobre topología empírica. NO. Fallar
+
+================================================================================
 
 Actúa como un arquitecto de software y desarrollador experto en R, RStudio, Shiny y Teoría de Grafos. Genera la estructura completa, limpia, comentada en español y modular para una aplicación de Shiny orientada al análisis e interacción visual del "Problema del Clique Implantado" (Planted Clique Problem).
 
@@ -54,13 +55,13 @@ mi_proyecto_clique/
 - Construye la maquetación visual pura utilizando 'fluidPage' y vincula de forma estricta el archivo CSS externo en el encabezado mediante: tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")).
 - Implementa un 'sidebarLayout' con un panel lateral (ancho 3, clase "scrollable-sidebar") y un panel principal (ancho 9).
 - El panel lateral debe segmentar mediante separadores visuales (hr()) y títulos en negrita cuatro secciones de control:
-  * Sección 1 (Grafo Base): Slider de número de vértices (5 a 50) y botón "Regenerar Grafo" (clase "btn-primary btn-block").
-  * Sección 2 (Edición Directa): WellPanel explicativo y un 'verbatimTextOutput' llamado "pivot_status" que muestre el nodo pivote actual.
-  * Sección 3 (Implantación): Slider para el tamaño del clique 'k' (3 a 15), botón "Implantar Clique Aleatorio" (clase "btn-success btn-block") y un 'uiOutput' dinámico llamado "planted_clique_ui".
+  * Sección 1 (Grafo Base): Slider de número de vértices (5 a 155) (por defecto 40), Slider de valor p (0 a 1) (por defecto 0.5) y botón "Regenerar Grafo" (clase "btn-primary btn-block").
+  * Sección 2 (Edición Directa): WellPanel explicativo minimalista y un 'verbatimTextOutput' llamado "pivot_status" que muestre el nodo pivote actual.
+  * Sección 3 (Implantación): Slider para el tamaño del clique 'k' (3 a 40), botón "Implantar Clique Aleatorio" (clase "btn-success btn-block") y un 'uiOutput' dinámico llamado "planted_clique_ui".
   * Sección 4 (Algoritmo): Botón "Buscar Clique Máximo" (clase "btn-warning btn-block") y un 'uiOutput' dinámico llamado "algorithm_monitor_ui".
 - El panel principal se organiza en dos pestañas ('tabsetPanel'):
-  * Pestaña "Vista de Red": aloja un 'visNetworkOutput' ("network_plot") que cubre el 100% de ancho y 700px de alto.
-  * Pestaña "Mapa de Bits (Adyacencia)": aloja un contenedor div (.matrix-plot-container) con un 'plotOutput' ("adjacency_bitmap_plot") de 650px x 650px que capture eventos de clic mediante el argumento click = "matrix_click".
+  * Pestaña "Vista de Red": aloja un 'visNetworkOutput' ("network_plot") que cubre el 100% de ancho y 100% de alto.
+  * Pestaña "Mapa de Bits (Adyacencia)": aloja un contenedor div (.matrix-plot-container) con un 'plotOutput' ("adjacency_bitmap_plot") cuadrado, que ocupe 100% del alto, y que capture eventos de clic mediante el argumento click = "matrix_click".
 
 ==============================================================================
 4. ARCHIVO: server.R
@@ -76,7 +77,7 @@ mi_proyecto_clique/
 ==============================================================================
 
 A) src/sub_generate_graph.R:
-- Contiene el 'eventReactive' asociado al botón de regeneración (y la carga inicial con ignoreNULL = FALSE) para crear un grafo basado en el modelo Erdős-Rényi G(n, p) disperso con p = 1.5 / n. Ajusta tamaños estéticos de nodos según la densidad.
+- Contiene el 'eventReactive' asociado al botón de regeneración (y la carga inicial con ignoreNULL = FALSE) para crear un grafo basado en el modelo Erdős-Rényi G(n, p) con p = 0.5. Ajusta tamaños estéticos de nodos a 11px.
 - Renderiza 'output$network_plot' abstrayendo los datos mediante 'isolate(v$nodes)' e 'isolate(v$edges)'. Esto es obligatorio para congelar el layout espacial de las coordenadas físicas y evitar que la red parpadee o se mueva cuando se editen enlaces. Desactiva la física tras 100 iteraciones usando el evento 'stabilizationIterationsDone'. Captura eventos de clics enviando inputs customizados a Shiny ('node_canvas_click' y 'empty_canvas_click').
 
 B) src/sub_matrix_interaction.R:
@@ -90,6 +91,13 @@ C) src/sub_network_interaction.R:
 
 D) src/sub_algorithms.R:
 - Controla el botón de implantación: selecciona k nodos al azar, calcula sus pares combinatorios (combn) e inyecta las aristas faltantes pintando los elementos de verde claro en pantalla mediante proxy sin alterar el layout espacial.
-- Controla el botón de ejecución del algoritmo: simula una traza de logs de manera pausada y secuencial volcando texto en la terminal virtual y resalta el clique final en color naranja vibrante utilizando el proxy de actualización sobre el grafo estático. Renderiza las UIs dinámicas de los bloques de resultados.
+- Controla el botón de ejecución del algoritmo: muestra una traza de logs de manera pausada y secuencial volcando texto en la terminal virtual a medida que el algoritmo progresa. Resalta el clique final en color naranja vibrante utilizando el proxy de actualización sobre el grafo estático. Renderiza las UIs dinámicas de los bloques de resultados.
+- Detalle del algoritmo:
+Se implementa un algoritmo espectral para la deteccion del clique oculto propuesto por Alon et al. (1998) en Alon, N., Krivelevich, M., and Sudakov, B. (1998). Finding a large hidden clique in a random graph. Random Structures & Algorithms, 13(3-4):457–466. A grandes razgos consiste en:
+1: Sea A la matriz de adyacencia del grafo observado G = (V, E).
+2: Computar u2 = z/||z|| el segundo vector propio de A.
+3: Sea U ⊆ V el subconjunto de los v ertices que corresponden a las k coordenadas de u2 de mayor magnitud.
+4: Q = {i ∈ V : i tiene al menos (3/4)k vecinos en U}.
+Q es la estimacion de la recuperacion del clique.
 
 Entrega los códigos de los 7 archivos de manera independiente, limpios, extensamente comentados en español línea por línea y listos para producción.
