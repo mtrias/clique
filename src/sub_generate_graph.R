@@ -48,6 +48,7 @@ generate_graph_event <- eventReactive({
     edges_df$id <- character()
   }
 
+  v$g <- g
   v$nodes <- nodes_df
   v$edges <- edges_df
   v$matrix_trigger <- v$matrix_trigger + 1

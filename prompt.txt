@@ -89,7 +89,7 @@ D) src/sub_algorithms.R:
 Se implementa un algoritmo espectral para la deteccion del clique oculto propuesto por Alon et al. (1998) en Alon, N., Krivelevich, M., and Sudakov, B. (1998). Finding a large hidden clique in a random graph. Random Structures & Algorithms, 13(3-4):457–466. A grandes razgos consiste en:
 1: Sea A la matriz de adyacencia del grafo observado G = (V, E).
 2: Computar u2 = z/||z|| el segundo vector propio de A.
-3: Sea U ⊆ V el subconjunto de los v ertices que corresponden a las k coordenadas de u2 de mayor magnitud.
+3: Sea U ⊆ V el subconjunto de los vertices que corresponden a las k coordenadas de u2 de mayor magnitud.
 4: Q = {i ∈ V : i tiene al menos (3/4)k vecinos en U}.
 Q es la estimacion de la recuperacion del clique.
 

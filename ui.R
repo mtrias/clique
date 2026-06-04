@@ -26,7 +26,7 @@ ui <- fluidPage(
 
       # SECCIÓN 1: Configuración de la topología inicial del grafo
       h4(tags$b("1. Grafo Base")),
-      sliderInput("num_vertices", "Número de Vértices:", min = 5, max = 155, value = 100, step = 1),
+      sliderInput("num_vertices", "Número de Vértices:", min = 5, max = 205, value = 100, step = 1),
       actionButton("regenerate_btn", "Regenerar Grafo", class = "btn-primary btn-block", icon = icon("sync")),
 
       hr(), # Separador visual horizontal
@@ -46,7 +46,7 @@ ui <- fluidPage(
 
       # SECCIÓN 3: Configuración del subgrafo completo oculto (Clique Plantado)
       h4(tags$b("3. Implantación")),
-      sliderInput("clique_size", "Tamaño del Clique (k):", min = 5, max = 50, value = 20, step = 1),
+      sliderInput("clique_size", "Tamaño del Clique (k):", min = 5, max = 155, value = 141, step = 1),
       actionButton("plant_random_clique_btn", "Implantar Clique Aleatorio", class = "btn-success btn-block", icon = icon("dice")),
       br(),
       # Contenedor dinámico que mostrará la lista de nodos que forman el clique implantado

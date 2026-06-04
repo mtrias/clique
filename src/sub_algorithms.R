@@ -66,26 +66,18 @@ observeEvent(input$run_clique_btn, {
   algo_logs(txt)
   Sys.sleep(1)
 
-  # --- PASO 1: Obtención de la Matriz de Adyacencia Real de los datos ---
-  # Reconstruimos la matriz simétrica pura del estado actual de la app (v$nodes y v$edges)
   node_ids <- sort(as.integer(v$nodes$id))
   n <- length(node_ids)
 
-  # Inicializar matriz vacía
-  A <- matrix(0, nrow = n, ncol = n, dimnames = list(node_ids, node_ids))
+  # --- PASO 1: Obtención de la Matriz de Adyacencia ---
+  A <- as_adjacency_matrix(v$g)
 
-  # Rellenar con las aristas existentes
-  if (!is.null(v$edges) && nrow(v$edges) > 0) {
-    for (i in 1:nrow(v$edges)) {
-      f <- as.character(v$edges$from[i])
-      t <- as.character(v$edges$to[i])
-      A[f, t] <- 1
-      A[t, f] <- 1
-    }
-  }
+  # Cambiar la diagonal a 1 (no necesario?)
+  #diag(A) <- 1
 
   message("matriz de adyacencia pronta") #####>>>>
-  message(A)                             #####>>>>
+  mensaje_formateado <- paste(capture.output(print(A)), collapse = "\n")
+  message(mensaje_formateado)
 
   txt <- paste0(algo_logs(), ">> [PASO 2] Ejecutando Descomposición Espectral (Eigen-decomposition)...\n")
   algo_logs(txt)
@@ -123,9 +115,15 @@ observeEvent(input$run_clique_btn, {
 
   # Ordenar por valor absoluto (magnitud de la perturbación espectral) de mayor a menor
   u2_abs_sorted <- sort(abs(u2), decreasing = TRUE)
+  message("u2 ordenado:")
+  mensaje_formateado <- paste(capture.output(print(u2_abs_sorted)), collapse = "\n")
+  message(mensaje_formateado)
 
   # Seleccionar las primeras k etiquetas de nodos de mayor magnitud
   U_nodes <- names(u2_abs_sorted)[1:k_target]
+  message("u2 ordenado, primeras k:")
+  mensaje_formateado <- paste(capture.output(print(U_nodes)), collapse = "\n")
+  message(mensaje_formateado)
 
   txt <- paste0(algo_logs(), ">> Subconjunto espectral inicial U localizado (k=", k_target, ").\n")
   txt <- paste0(txt, ">> [PASO 4] Iniciando fase de limpieza (3/4 * k vecinos en U)...\n")
@@ -134,17 +132,24 @@ observeEvent(input$run_clique_btn, {
 
   # --- PASO 4: Fase de Extensión / Limpieza (Voto de Vecindad) ---
   Q_nodes <- character() # Nos aseguramos de que empiece como un vector de caracteres vacío
-  umbral_vecinos <- ceiling((3 / 4) * k_target)
+  umbral_vecinos <- floor((3 / 4) * k_target)
 
-  for (node in as.character(node_ids)) {
-    # Forzamos a que las consultas de matriz usen caracteres para los nombres de las filas
-    vecinos_nodo <- names(which(A[as.character(node), ] == 1))
+  # Calculo del conjunto W
+  for (node in node_ids) {
+
+    message(paste0("limpiando nodo:",node," considerando umbral:",umbral_vecinos))
+
+    vecinos_nodo <- which(A[node, ] == 1)
+    message(paste("vecinos:", capture.output(print(vecinos_nodo)), collapse = "\n"))
 
     # Contar cuántos vecinos están en el subconjunto espectral U
     conteo_en_U <- sum(vecinos_nodo %in% U_nodes)
+    message(paste("conteo:", capture.output(print(conteo_en_U)), collapse = "\n"))
 
     if (conteo_en_U >= umbral_vecinos) {
-      Q_nodes <- c(Q_nodes, as.character(node)) # CASADO FORZADO A CHARACTER
+      Q_nodes <- c(Q_nodes, as.character(node))
+    } else {
+      message("No pasa el umbral")
     }
   }
 
@@ -152,7 +157,8 @@ observeEvent(input$run_clique_btn, {
   found_nodes_list(Q_nodes)
 
   message("RESULTADO:")
-  message(Q_nodes)
+  mensaje_formateado <- paste(capture.output(print(Q_nodes)), collapse = "\n")
+  message(mensaje_formateado)
 
   # --- FINALIZACIÓN Y FEEDBACK VISUAL ---
   ground_truth <- planted_nodes_list()
@@ -171,20 +177,20 @@ observeEvent(input$run_clique_btn, {
 
   # --- ACTUALIZACIÓN CRÍTICA DEL FRONTEND MEDIANTE PROXY ---
   # 1. Resetear la estética de todos los nodos al color azul/gris original
-  nodes_reset <- data.frame(
-    id = as.character(v$nodes$id), # Forzado a character
-    color.background = "#97C2FC",
-    color.border = "#2B7CE9",
-    borderWidth = 1,
-    stringsAsFactors = FALSE
-  )
-  visNetworkProxy("network_plot") %>% visUpdateNodes(nodes = nodes_reset)
+  #nodes_reset <- data.frame(
+  #  id = as.character(v$nodes$id), # Forzado a character
+  #  color.background = "#97C2FC",
+  #  color.border = "#2B7CE9",
+  #  borderWidth = 1,
+  #  stringsAsFactors = FALSE
+  #)
+  #visNetworkProxy("network_plot") %>% visUpdateNodes(nodes = nodes_reset)
 
   # 2. Si el algoritmo recuperó nodos, pintarlos inmediatamente de naranja
   if (length(Q_nodes) > 0) {
     nodes_update <- data.frame(
       id = as.character(Q_nodes), # SOLUCIÓN: Forzado estricto a character para Javascript
-      color.background = "#FFBB99",
+      #color.background = "#FFBB99",
       color.border = "#FF5500",
       borderWidth = 2,
       stringsAsFactors = FALSE
