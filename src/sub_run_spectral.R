@@ -1,115 +1,76 @@
-# ----------------------------------------------------------------------------
-# COMPONENTE: ALGORITMO ESPECTRAL DE DETECCIÓN CON TELEMETRÍA
-# ARCHIVO: src/sub_run_spectral.R
-# ----------------------------------------------------------------------------
-observeEvent(input$run_clique_btn, {
-  req(v$nodes)
+# src/sub_run_spectral.R
+
+observeEvent(input$btn_run_algo, {
+  req(v$nodes, v$edges)
 
   algo_running(TRUE)
-  found_nodes_list(NULL)
+  k <- input$clique_k
 
-  # Inicialización de búfer de logs para el frontend
-  txt <- ">> [ALGORITMO] Iniciando Detección Espectral Adaptativa...\n"
-  algo_logs(txt)
+  # Generar grafo igraph subyacente para el cómputo matricial
+  g_calc <- igraph::graph_from_data_frame(v$edges, directed = FALSE, vertices = v$nodes)
+  A <- igraph::as_adjacency_matrix(g_calc, sparse = FALSE) # Matriz densa para eigen() nativo de R base
+  n_nodes <- nrow(A)
 
-  # --- PASO 1: Reconstrucción Algebraica de la Topología ---
-  g_actual <- graph_from_data_frame(d = v$edges, vertices = v$nodes, directed = FALSE)
-  A <- as_adjacency_matrix(g_actual, sparse = FALSE)
-  node_ids <- rownames(A)
-  ground_truth <- as.character(planted_nodes_list())
+  current_logs <- c("--- INICIO DE BÚSQUEDA ESPECTRAL (Alon et al.) ---")
 
-  # --- PASO 2: Factorización Espectral y Selección de Vector ---
-  ev <- eigen(A, symmetric = TRUE)
-  u1_dispercion <- sd(abs(ev$vectors[, 1]))
+  # 1. Descomposición Espectral
+  eig <- eigen(A, symmetric = TRUE)
+  u1 <- eig$vectors[, 1]
+  u2 <- eig$vectors[, 2]
 
-  cat("\n==================================================\n")
-  cat("[DIAGNÓSTICO] ANÁLISIS DE MATRIZ ALEATORIA\n")
-  cat("==================================================\n")
-  cat(paste("-> Desviación Estándar de u1:", round(u1_dispercion, 4), "\n"))
+  # Evaluación empírica de la dispersión de Wigner
+  sd_u1 <- sd(abs(u1))
+  current_logs <- c(current_logs, sprintf("Dispersión espectral en u1: %.4f", sd_u1))
 
-  # Criterio dinámico basado en la dispersión del Perron-Frobenius
-  if (u1_dispercion > 0.05) {
-    u_target <- ev$vectors[, 1]
-    vector_identificado <- "u1 (Modo Dominante)"
+  if (sd_u1 > 0.05) {
+    current_logs <- c(current_logs, "Señal dominante detectada en el primer autovector (u1).")
+    target_vector <- abs(u1)
   } else {
-    u_target <- ev$vectors[, 2]
-    vector_identificado <- "u2 (Modo Subestructura)"
-  }
-  names(u_target) <- node_ids
-
-  txt <- paste0(algo_logs(), ">> [LOG] Selector automático eligió: ", vector_identificado, "\n")
-  algo_logs(txt)
-
-  # --- PASO 3: Proyección en el Espacio Vectorial (Truncamiento K) ---
-  k_target <- input$clique_size
-  u_abs_sorted <- sort(abs(u_target), decreasing = TRUE)
-  U_nodes <- names(u_abs_sorted)[1:k_target]
-
-  # Evaluación matemática instantánea del aislamiento de señal
-  if (!is.null(ground_truth)) {
-    nodos_correctos_en_U <- intersect(U_nodes, ground_truth)
-    cat(paste("-> Nodos del Clique Real en conjunto inicial U:",
-              length(nodos_correctos_en_U), "de", k_target, "\n"))
-    cat(paste("-> Nodos falsos positivos que se colaron en U:",
-              paste(setdiff(U_nodes, ground_truth), collapse = ", "), "\n"))
+    current_logs <- c(current_logs, "Utilizando el segundo autovector (u2) según la cota de la brecha espectral.")
+    target_vector <- abs(u2)
   }
 
-  # --- PASO 4: Fase de Extensión / Limpieza Combinatoria (Q) ---
-  Q_nodes <- character()
-  umbral_vecinos <- ceiling((3 / 4) * k_target)
+  # 2. Selección del subconjunto semilla U (Truncamiento top-k)
+  node_indices <- order(target_vector, decreasing = TRUE)[1:k]
+  U_nodes <- igraph::V(g_calc)$name[node_indices]
 
-  cat(paste("-> Umbral de vecindad requerido para clasificar en Q:", umbral_vecinos, "nodos\n"))
-  cat("\n[REVISIÓN DE NODOS DEL CLIQUE REAL]\n")
+  current_logs <- c(current_logs, sprintf("Fase 1: Conjunto inicial U extraído (tamaño %d).", length(U_nodes)))
 
-  for (node in node_ids) {
-    vecinos_nodo <- names(which(A[as.character(node), ] == 1))
-    conteo_en_U <- sum(vecinos_nodo %in% U_nodes)
+  # 3. Fase de Extensión (Limpieza de Falsos Positivos)
+  threshold <- ceiling(0.75 * k)
+  Q_nodes <- c()
 
-    # Telemetría específica para el subconjunto de control (ground truth)
-    if (node %in% ground_truth) {
-      cat(paste("   Nodo", node, "-> Vecinos dentro de U:", conteo_en_U))
-      if (conteo_en_U >= umbral_vecinos) {
-        cat(" [PASÓ a Q]\n")
-      } else {
-        cat(" [RECHAZADO - Falso Negativo]\n")
-      }
-    }
+  for (v_name in igraph::V(g_calc)$name) {
+    # Extraer vecinos del vértice
+    neighbors_v <- as.character(igraph::neighbors(g_calc, v_name)$name)
+    # Contar conexiones hacia el conjunto semilla U
+    connections_to_U <- length(intersect(neighbors_v, U_nodes))
 
-    if (conteo_en_U >= umbral_vecinos) {
-      Q_nodes <- c(Q_nodes, as.character(node))
+    if (connections_to_U >= threshold) {
+      Q_nodes <- c(Q_nodes, v_name)
     }
   }
 
-  found_nodes_list(Q_nodes)
+  current_logs <- c(current_logs, sprintf("Fase 2: Umbral de conexión hacia U = %d aristas.", threshold))
+  current_logs <- c(current_logs, sprintf("Nodos recuperados finales (Conjunto Q): %d", length(Q_nodes)))
 
-  # --- PASO 5: Mapeo de Convergencia ---
-  if (!is.null(ground_truth)) {
-    exito <- length(Q_nodes) == length(ground_truth) && all(sort(Q_nodes) == sort(ground_truth))
-    if (exito) {
-      txt <- paste0(algo_logs(), ">> [ÉXITO] ¡Clique Oculto recuperado de forma exacta!\n")
-    } else {
-      txt <- paste0(algo_logs(), ">> [AVISO] Detección parcial. Revisa la terminal de R para ver la pérdida de señal.\n")
-    }
-  }
-  algo_logs(txt)
+  # Convertir a entero para cruce lógico
+  found_nodes <- as.integer(Q_nodes)
+  found_nodes_list(found_nodes)
 
-  # --- PASO 6: Sincronización Estética mediante visNetworkProxy ---
-  nodes_reset <- data.frame(
-    id = as.character(v$nodes$id),
-    color.background = "#97C2FC", color.border = "#2B7CE9", borderWidth = 1,
-    stringsAsFactors = FALSE
-  )
-  visNetworkProxy("network_plot") %>% visUpdateNodes(nodes = nodes_reset)
-
-  if (length(Q_nodes) > 0) {
-    nodes_update <- data.frame(
-      id = as.character(Q_nodes),
-      color.background = "#FFBB99", color.border = "#FF5500", borderWidth = 2,
+  # 4. Actualización visual atómica
+  if (length(found_nodes) > 0) {
+    # Utilizamos 'color.border' para evitar sobreescribir el 'color.background'
+    # de los nodos (ya sean azules originales o verdes si fueron implantados).
+    update_nodes_algo <- data.frame(
+      id = found_nodes,
+      borderWidth = 5,           # Borde engrosado para resaltar
+      color.border = "#fd7e14",  # Borde Naranja estricto (Hexadecimal definido en el CSS)
       stringsAsFactors = FALSE
     )
-    visNetworkProxy("network_plot") %>% visUpdateNodes(nodes = nodes_update)
+
+    visNetworkProxy("network_plot") %>% visUpdateNodes(update_nodes_algo)
   }
 
-  cat("==================================================\n\n")
-  algo_running(FALSE)
+  algo_logs(current_logs)
 })

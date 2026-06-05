@@ -1,72 +1,64 @@
-# ----------------------------------------------------------------------------
-# COMPONENTE: IMPLANTACIÓN DE ESTRUCTURA OCULTA (PLANTED CLIQUE)
-# ARCHIVO: src/sub_plant_clique.R
-# ----------------------------------------------------------------------------
-observeEvent(input$plant_random_clique_btn, {
+# src/sub_plant_clique.R
+
+observeEvent(input$btn_plant_clique, {
   req(v$nodes)
-  k <- input$clique_size
-  active_pivot(NULL)
 
-  # Selección aleatoria uniforme de los nodos del clique
-  all_node_ids <- as.character(v$nodes$id)
-  chosen_nodes <- sample(all_node_ids, k)
-  planted_nodes_list(chosen_nodes)
+  k <- input$clique_k
+  available_nodes <- v$nodes$id
 
-  # Telemetría de inyección en consola R
-  cat("\n==================================================\n")
-  cat("[LOG] IMPLANTACIÓN DE ESTRUCTURA OCULTA (PLANTED CLIQUE)\n")
-  cat("==================================================\n")
-  cat(paste("-> Tamaño del Subgrafo Completo (k):", k, "\n"))
-  cat(paste("-> Identificadores únicos del Ground Truth:\n   ",
-            paste(sort(as.numeric(chosen_nodes)), collapse = ", "), "\n"))
+  if (length(available_nodes) < k) return()
 
-  # 1. Generar la totalidad de combinaciones binarias teóricas del clique K_k
-  combinations <- combn(chosen_nodes, 2)
-  potential_edges <- data.frame(
-    from = as.character(combinations[1, ]),
-    to = as.character(combinations[2, ]),
-    stringsAsFactors = FALSE
-  ) %>%
+  target_nodes <- sample(available_nodes, k)
+  planted_nodes_list(target_nodes)
+
+  all_clique_edges <- as.data.frame(t(combn(target_nodes, 2)))
+  colnames(all_clique_edges) <- c("from", "to")
+
+  all_clique_edges <- all_clique_edges %>%
     mutate(
-      u_min = pmin(from, to),
-      u_max = pmax(from, to)
+      u = pmin(from, to),
+      v = pmax(from, to)
     )
 
-  # 2. Normalización indexada de las aristas preexistentes del modelo Erdős-Rényi
-  existing_edges <- v$edges
-  if (nrow(existing_edges) > 0) {
-    existing_normalized <- existing_edges %>%
-      mutate(
-        u_min = pmin(as.character(from), as.character(to)),
-        u_max = pmax(as.character(from), as.character(to))
-      )
+  current_edges <- v$edges %>%
+    mutate(
+      u = pmin(from, to),
+      v = pmax(from, to)
+    )
 
-    # 3. Exclusión exacta de intersecciones simétricas (Evita la duplicación)
-    new_edges_filtered <- potential_edges %>%
-      anti_join(existing_normalized, by = c("u_min", "u_max"))
-  } else {
-    new_edges_filtered <- potential_edges
-  }
-
-  # 4. Formateo y mutación del estado reactivo global
-  if (nrow(new_edges_filtered) > 0) {
-    new_edges <- data.frame(
-      from = new_edges_filtered$from,
-      to = new_edges_filtered$to,
-      smooth = FALSE,
-      color = "#00CC44",
+  # Filtrado de complemento mediante índices ordenados
+  missing_edges <- anti_join(all_clique_edges, current_edges, by = c("u", "v")) %>%
+    select(from, to) %>%
+    mutate(
+      color = "#28a745",
       width = 2,
-      stringsAsFactors = FALSE
+      id = paste0(pmin(from, to), "-", pmax(from, to))
     )
-    new_edges$id <- paste0(new_edges$from, "-", new_edges$to)
 
-    # Unión indexada al set de datos reactivo
-    v$edges <- bind_rows(existing_edges, new_edges)
+  if (nrow(missing_edges) > 0) {
+    v$edges <- bind_rows(v$edges, missing_edges)
+    visNetworkProxy("network_plot") %>% visUpdateEdges(missing_edges)
 
-    # Inyección dinámica de elementos al lienzo sin redibujado total
-    visNetworkProxy("network_plot") %>% visUpdateEdges(edges = new_edges)
+    update_nodes <- data.frame(
+      id = target_nodes,
+      color = list(background = "#e9f7ef", border = "#28a745"),
+      borderWidth = 3
+    )
+    visNetworkProxy("network_plot") %>% visUpdateNodes(update_nodes)
+
+    v$matrix_trigger <- v$matrix_trigger + 1
   }
 
-  cat(paste("-> Aristas reales inyectadas (no preexistentes):", nrow(new_edges_filtered), "\n"))
-  cat("==================================================\n\n")
+  logs <- algo_logs()
+  algo_logs(c(logs, sprintf("Clique K_%d incrustado de manera determinista. Aristas agregadas: %d.", k, nrow(missing_edges))))
+})
+
+output$planted_clique_ui <- renderUI({
+  nodes <- planted_nodes_list()
+  if (length(nodes) > 0) {
+    div(class = "clique-box",
+        tags$b("Nodos del Clique Oculto:"),
+        p(paste(sort(nodes), collapse = ", "), style = "word-wrap: break-word; font-size: 0.85em;")
+    )
+  }
 })
