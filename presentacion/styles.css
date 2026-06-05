@@ -1,0 +1,8 @@
+p {
+  font-size: 30px;
+}
+
+svg.mermaid-js {
+  max-width: 100% !important;
+  width: 100% !important;
+}

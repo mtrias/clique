@@ -1,0 +1,511 @@
+---
+title: "Problema del Clique Implantado"
+author: "Miguel Trias"
+format:
+  revealjs:
+    center: false
+    css: styles.css
+---
+
+{{< include macros.tex.qmd >}}
+
+```{r}
+#| label: setup
+#| include: false
+
+library(igraph)
+library(Matrix)
+library(ggplot2)
+
+CONEXIONES_CLIQUE_NO_ALEATORIO <- c(1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 5,6, 4,6, 5,7, 6,7, 6,8)
+CONEXIONES_CLIQUE_ALEATORIO <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8)
+
+# Fachada para construir grafos
+grafo <- function(conexiones) {
+  
+  g <- make_graph(conexiones, directed = FALSE)
+  
+  # Devolvemos el objeto 'g' de forma invisible 
+  # para que puedas extraer la matriz de adyacencia después
+  invisible(g)
+}
+
+imprimirGrafo <- function(grafo) {
+  # Eliminar los márgenes base de R (Abajo, Izquierda, Arriba, Derecha)
+  par(mar = c(0, 0, 0, 0))
+  plot(
+    grafo, 
+    layout = layout_with_kk(g),
+    vertex.color = "#e6f2ff",          
+    vertex.frame.color = "#116699",    
+    vertex.label.color = "#333",    
+    vertex.label.family = "sans",    
+    vertex.size = 25,                
+    edge.color = "#116699",            
+    edge.width = 2,
+    # Reducir aún más el bounding box interno de igraph
+    margin = .1
+  )                  
+}
+
+adyacencia <- function(grafo) {
+  as_adj(grafo, sparse = TRUE)
+}
+
+imprimirAdyacencia <- function(a) {
+  nFilas <- nrow(a)
+  img <- image(
+    a,
+    main = "Matriz de Adyacencia",
+    sub = sprintf("(n = %d)", nFilas),
+    #xlab = "Vértices",
+    #ylab = "Vértices",
+    
+    # TRUE es mas rapido, pero invierte el eje "y" para matrices grandes
+    # FALSE es mas lento, no invierte el eje, pero genera un efecto de aliasing
+    useRaster = FALSE,
+    
+    aspect = "iso",
+    
+    # usando useRaster=FALSE, el color es interpolado y no 
+    col.regions = c("#eeeeee", "#111111"),
+    
+    # Define los límites exactos de los intervalos de color
+    # necesario para useRaster = FALSE
+    at = c(-0.5, 0.5, 1.5),
+  )
+
+  # Agrego un latice a matrices "chicas"
+  if (nFilas < 40) {
+      img <- update(img, panel = function(x, y, z, ...) {
+        lattice::panel.levelplot(x, y, z, ...)
+        lattice::panel.abline(h = seq(0.5, nFilas + 0.5, by = 1), col = "#d3d3d3", lwd = 0.5)
+        lattice::panel.abline(v = seq(0.5, nFilas + 0.5, by = 1), col = "#d3d3d3", lwd = 0.5)
+      })
+  }
+    
+  print(img)
+}
+
+grados <- function(grafo) {
+  #calcula el número de aristas incidentes
+  grados <- degree(grafo, mode = "all")
+  return(grados)
+}
+
+imprimirDistribucionGrados <- function(grafo) {
+  vector_grados <- grados(g)
+  df_grados <- data.frame(Grado = vector_grados)
+  ggplot(df_grados, aes(x = Grado)) +
+    geom_bar(
+      fill = "#116699",
+      color = "white",
+      width = 1
+    ) +
+    labs(
+      title = "Distribución del Grado de los Vértices",
+      x = "Grado (Número de conexiones)",
+      y = "Frecuencia (Cantidad de vértices)"
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank()
+    )
+}
+
+# Fabrica un vector de conexiones de un grafo aleatorio G(n, p=0.5) de Erdős-Rényi
+conexiones <- function(n) {
+  g <- igraph::sample_gnp(n = n, p = 0.5, directed = FALSE, loops = FALSE)
+  
+  # Extraer la lista de aristas como matriz (E x 2)
+  # as_edgelist devuelve una matriz donde cada fila es una arista
+  matriz_aristas <- igraph::as_edgelist(g, names = FALSE)
+  
+  # Aplanar la matriz a un vector de formato c(u1, v1, u2, v2, ...)
+  # t() transpone para que as.vector lea fila por fila en lugar de columna por columna
+  vector_conexiones <- as.vector(t(matriz_aristas))
+  
+  return(vector_conexiones)
+}
+
+# Implanta un clique de tamaño k en una posicion aleatoria (TRUE) o en los primeros vertices (FALSE)
+implantar <- function(conexiones, k, positionRandom = TRUE) {
+  # Inferir el número total de vértices (n) buscando el índice máximo en el vector
+  n_nodos <- max(conexiones)
+  
+  if (k > n_nodos) {
+    stop("El tamaño del clique (k) no puede exceder el número total de vértices (n).")
+  }
+  
+  # Seleccionar el subconjunto de vértices para el clique
+  if (positionRandom) {
+    nodos_clique <- sample(1:n_nodos, k)
+  } else {
+    nodos_clique <- 1:k
+  }
+  
+  # combn() genera todas las combinaciones posibles (las aristas del clique).
+  # Retorna una matriz de 2 x C(k,2). Transponemos para tener formato de lista de aristas (C(k,2) x 2).
+  matriz_clique <- t(combn(nodos_clique, 2))
+  
+  # Reconstruir la matriz de aristas original a partir del vector
+  matriz_orig <- matrix(conexiones, ncol = 2, byrow = TRUE)
+  
+  # Estandarización topológica:
+  # Para poder detectar si el clique agrega una arista que G(n, 0.5) ya había generado por azar,
+  # forzamos a que en cada par de nodos el menor esté a la izquierda y el mayor a la derecha.
+  # Usamos pmin y pmax porque están vectorizados en C y son extremadamente rápidos.
+  orig_u <- pmin(matriz_orig[, 1], matriz_orig[, 2])
+  orig_v <- pmax(matriz_orig[, 1], matriz_orig[, 2])
+  matriz_orig <- cbind(orig_u, orig_v)
+  
+  clique_u <- pmin(matriz_clique[, 1], matriz_clique[, 2])
+  clique_v <- pmax(matriz_clique[, 1], matriz_clique[, 2])
+  matriz_clique <- cbind(clique_u, clique_v)
+  
+  # Concatenar el grafo base con el clique
+  matriz_combinada <- rbind(matriz_orig, matriz_clique)
+  
+  # Extraer únicamente los pares de aristas únicos para preservar un grafo simple
+  matriz_unica <- unique(matriz_combinada)
+  
+  # Aplanar la matriz final de vuelta al formato vectorial c(u1, v1, u2, v2, ...)
+  vector_final <- as.vector(t(matriz_unica))
+  
+  return(vector_final)
+}
+
+```
+
+## Motivacion
+
+- Interferencia de antenas
+- Correlacion de activos de una cartera
+- Deteccion de bots en redes sociales
+- Deteccion de ataques informaticos
+- Plegado de proteinas
+
+::: {.notes}
+- Breve explicacion de cada uno de los problemas.
+:::
+
+## Grafos
+
+::: {.columns}
+::: {.column width="50%"}
+{{< include grafo-simple.md >}}
+:::
+
+::: {.column width="50%"}
+$\mathcal{G}(V, E)$
+
+$E = \{ 1, \dots, n \}$
+
+$V = \{ (i,j) \quad i \ne j \}$
+:::
+:::
+
+::: {.notes}
+- Breve intro a grafos (si alguien la necesita)
+- No direccionado
+- Concepto: orden de un nodo
+:::
+
+## Matriz de Adyacencia
+
+::: {.columns}
+::: {.column width="50%"}
+{{< include grafo-simple.md >}}
+:::
+
+::: {.column width="50%"}
+$A \in \{0,1\}^{n\times n}$
+$$ A = \matrizAdySimple $$
+:::
+:::
+
+::: {.notes}
+- Simetrica
+- a_ii = 0
+:::
+
+## Motivacion (revisitado)
+
+::: {.columns}
+::: {.column width="50%"}
+{{< include grafo-simple.md >}}
+:::
+
+::: {.column width="50%"}
+$$ A = \matrizAdySimple $$
+:::
+:::
+
+::: {.notes}
+- cada nodo es un activo financiero
+- correlacion positiva => riesgo
+- correlacion negativa => refugio
+- correlacion 0 => diversificacion
+- \theta frontera aceptable de correlacion => Matriz de ceros y unos
+:::
+
+## Grafos de Erdos-Renyi 
+
+$\mathcal{G}(n,p)$
+
+- Tamaño $n$
+- Aristas $~Ber(p)$
+- Orden de un nodo $~Bin(n-1, p)$
+
+::: {.notes}
+- Nos interesa el caso:
+- p=.5 (maxima entropia)
+- n grande
+:::
+
+## ¿Matriz de Adyacencia de un G(n,p)?
+
+::: {.incremental}
+INSERTAR IMAGENES DEPENDIENDO DE P
+:::
+
+## ¿Que es un Clique ?
+
+```{r}
+#| label: fig-clique-1
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 4
+#| echo: false
+#| eval: true
+
+g <- grafo(CONEXIONES_CLIQUE_ALEATORIO)
+imprimirGrafo(g)
+```
+
+::: {.notes}
+- Comunidad / Pandilla
+- Subgrafo
+- Completo
+- Maximal (1,2,3,4) (5,6,7)
+- Ojo: Maximal $\neq$ Maximo (5,6,7)
+:::
+
+## Clique aleatorio en A
+
+```{r}
+g <- grafo(CONEXIONES_CLIQUE_ALEATORIO)
+```
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirGrafo(g)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: "adyacencia-con-clique-chico-aleatorio"
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirAdyacencia(adyacencia(g))
+```
+:::
+:::
+
+::: {.notes}
+- No se ve a menos que reordenemos columnas
+:::
+
+## Clique NO aleatorio en A
+
+```{r}
+g <- grafo(CONEXIONES_CLIQUE_NO_ALEATORIO)
+```
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirGrafo(g)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: "adyacencia-chica-con-clique-ordenado"
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirAdyacencia(adyacencia(g))
+```
+:::
+:::
+
+::: {.notes}
+- No se ve a menos que reordenemos columnas
+:::
+
+
+## Clique en A del mundo real
+
+
+```{r}
+n=200
+k=40
+er = conexiones(n)
+er_clique_aleatorio = implantar(er, k, TRUE)
+er_clique_no_aleatorio = implantar(er, k, FALSE)
+```
+
+Matrices $G(n=`r n`, p=.5)$ con clique implantado de tamaño $k=`r k`$, en posicion aleatoria (izquierda) y fija (derecha)
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirAdyacencia(adyacencia(grafo(er_clique_aleatorio)))
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirAdyacencia(adyacencia(grafo(er_clique_no_aleatorio)))
+```
+:::
+:::
+
+
+## Clique en A del mundo real
+
+```{r}
+n=200
+k=150
+er = conexiones(n)
+er_clique_aleatorio = implantar(er, k, TRUE)
+er_clique_no_aleatorio = implantar(er, k, FALSE)
+```
+
+Matrices $G(n=`r n`, p=.5)$ con clique implantado de tamaño $k=`r k`$, en posicion aleatoria (izquierda) y fija (derecha)
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirAdyacencia(adyacencia(grafo(er_clique_aleatorio)))
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-align: "center"
+#| fig-width: 5
+#| fig-height: 5
+imprimirAdyacencia(adyacencia(grafo(er_clique_no_aleatorio)))
+```
+:::
+:::
+
+::: {.notes}
+- Como se ve el clique?
+- Depende de p, k y n
+- k muy grande, altera la "estructura base", la señal ahora no tiene ruido aleatorio, sino que es puro clique.
+:::
+
+
+
+## Kucera 1995
+
+Distribucion de grados de vertices
+: $k = O(\sqrt{n\log n})$
+
+```{r}
+n=200
+k=40
+```
+
+
+```{r}
+#| label: distribucion-grados-ger-clique-aleatorio
+cons = implantar(conexiones(n), k, TRUE)
+ger <- grafo(cons)
+imprimirDistribucionGrados(ger)
+```
+
+```{r}
+#| label: distribucion-grados-ger-clique-fijo
+cons = implantar(conexiones(n), k, FALSE)
+ger <- grafo(cons)
+imprimirDistribucionGrados(ger)
+```
+
+
+## Diagnostico 1
+
+```{r}
+cons = implantar(conexiones(n), k, FALSE)
+ger <- grafo(cons)
+vector_grados <- grados(ger)
+df_grados <- data.frame(Grado = vector_grados)
+df_grados
+```
+
+## Diagnostico 2
+
+```{r}
+
+ggplot(df_grados, aes(x = Grado)) +
+    geom_bar(
+      fill = "#116699",
+      color = "white",
+      width = 1
+    ) +
+    labs(
+      title = "Distribución del Grado de los Vértices",
+      x = "Grado (Número de conexiones)",
+      y = "Frecuencia (Cantidad de vértices)"
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank()
+    )
+
+grados <- degree(ger)
+summary(grados)
+cat("Número de nodos:", vcount(ger), "\n")
+cat("Número de aristas:", ecount(ger), "\n")
+```
+
+
+
+## Historia (2)
+
+Alon 1998
+$k=O(\sqrt n)$
+
+Lugosi 2017
+: El numero de cliques de tamaño $k$ de $\erMatrix[1/2]$ tiende a estar entre dos numeros enteros $m$ y $m+1$.
+
+Entonces, si buscamos un clique de tamaño $k < m$ sera indistinguible del ruido aleatorio
+
+
+## Analisis
+
+- $A^* = E(A)$
+- Vectores propios
