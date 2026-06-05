@@ -1,96 +1,86 @@
-Agregar:
-- configuracion de fisica:
-        gravitationalConstant = -100,
-        centralGravity = 0.1,
-        springLength = 250
-- Resultado: Proceso terminado sobre topología empírica. NO. Fallar
-- Agregar distribucion de orden de nodos
+AGREGAR
+- cuando tenemos pocos vertices la matriz es dificil de leer. Mostremos bordes finos y suaves que delimiten las filas y las columnas cuando el grafo sea menor que un cierto numero especificado en una constante. Comencemos con 50 nodos.
 
-================================================================================
+- al clickear en un nodo para agregar un arco, el grafico se redibuja completamente, haciendo dificil comprender la modificacion. necesitamos que el grafo no se redibuje sino que unicamente se agregue el arco sin mover los nodos.
 
-Actúa como un arquitecto de software y desarrollador experto en R, RStudio, Shiny y Teoría de Grafos. Genera la estructura completa, limpia, comentada en español y modular para una aplicación de Shiny orientada al análisis e interacción visual del "Problema del Clique Implantado" (Planted Clique Problem).
+- Cuando n es grande, los nodos quedan todos concentrados en un circulo cerca del centro. necesitamos relajar la fisica para que los nodos se distribuyan mas separados en el espacio disponible.
 
-La aplicación debe estar estrictamente modularizada y dividida en una estructura de carpetas específica. El comportamiento reactivo debe configurarse de tal forma que se eviten bucles infinitos y parpadeos visuales al editar la red desde la matriz algebraico-binaria de adyacencia.
 
+
+Actúa como un arquitecto de software y desarrollador experto en R, RStudio, Shiny y Teoría de Grafos.
+Genera la estructura completa, limpia, comentada en español y modular para una aplicación de Shiny orientada al análisis e interacción visual del "Problema del Clique Implantado" (Planted Clique Problem).
+La aplicación debe estar estrictamente modularizada y dividida en una estructura de carpetas específica.
+El comportamiento reactivo debe configurarse de tal forma que se eviten bucles infinitos y parpadeos visuales al editar la red.
+Todos los segmentos de codigo deben estar comentados para asegurar que yo pueda comprender que hace cada bloque
+Todos los valores constantes del codigo que puedan requerir modificarse deben estar aislados en un archivo de configuracion. por ej (intervalo minimo y maximo de n, colores que se repitan, umbral de legibilidad que cambia el comportamiento del codigo, etc)
 Debes generar los códigos completos para la siguiente estructura exacta de archivos:
-
-mi_proyecto_clique/
-├── global.R
-├── ui.R
-├── server.R
-├── www/
-│   └── styles.css
-└── src/
-    ├── sub_generate_graph.R
-    ├── sub_matrix_interaction.R
-    ├── sub_network_interaction.R
-    └── sub_algorithms.R
+clique/
+  ├── global.R
+  ├── ui.R
+  ├── server.R
+  ├── www/
+  │   └── styles.css
+  └── src/
+  │   └── sub_generate_graph.R
+  │   └── sub_matrix_interaction.R
+  │   └── sub_network_interaction.R
+  │   └── sub_plant_clique.R
+  │   └── sub_run_spectral.R
 
 ==============================================================================
-1. ARCHIVO: www/styles.css
+ARCHIVO: www/styles.css
 ==============================================================================
-- Define los estilos estéticos de la aplicación de forma independiente.
-- Debe incluir un fondo de página gris claro (#f4f6f9), un menú lateral con scroll interno activo (.scrollable-sidebar con max-height: 90vh; overflow-y: auto), contenedores acolchados para los gráficos y, de manera crítica, el estilo de una consola de terminal informática para el log algorítmico (.algo-console) con fondo negro (#1E1E1E), tipografía monoespaciada fija ('Courier New', monospace) y texto verde neón (#00FF66) con un borde izquierdo naranja (#FF5500).
-- Estiliza cajas (.clique-box y .search-box) con bordes verde claro y naranja para renderizar de manera limpia los nodos pertenecientes a los cliques implantados y recuperados.
+
+Define los estilos estéticos de la aplicación de forma independiente.
+Debe incluir un fondo de página gris claro (#f4f6f9), un menú lateral con scroll interno activo (.scrollable-sidebar con max-height: 90vh; overflow-y: auto), contenedores acolchados para los gráficos.
+Estiliza cajas (.clique-box y .search-box) con bordes verde claro y naranja para renderizar de manera limpia los nodos pertenecientes a los cliques implantados y recuperados.
 
 ==============================================================================
 2. ARCHIVO: global.R
-==============================================================================
-- Encárgate de inicializar el entorno cargando exclusivamente las librerías necesarias: 'shiny', 'visNetwork', 'igraph', 'dplyr' y 'ggplot2'.
-- No debes declarar ningún tipo de código CSS embebido o en texto aquí; la carga del diseño se delega por completo al archivo estático CSS mediante la UI.
+Encárgate de inicializar el entorno cargando exclusivamente las librerías necesarias: 'shiny', 'visNetwork', 'igraph', 'dplyr' y, de forma crítica, 'Matrix' para la renderización de matrices dispersas.
+No debes declarar ningún tipo de código CSS embebido o en texto aquí; la carga del diseño se delega por completo al archivo estático CSS mediante la UI.
 
 ==============================================================================
 3. ARCHIVO: ui.R
-==============================================================================
-- Construye la maquetación visual pura utilizando 'fluidPage' y vincula de forma estricta el archivo CSS externo en el encabezado mediante: tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")).
-- Implementa un 'sidebarLayout' con un panel lateral (ancho 3, clase "scrollable-sidebar") y un panel principal (ancho 9).
-- El panel lateral debe segmentar mediante separadores visuales (hr()) y títulos en negrita cuatro secciones de control:
-  * Sección 1 (Grafo Base): Slider de número de vértices (5 a 155) (por defecto 40), Slider de valor p (0 a 1) (por defecto 0.5) y botón "Regenerar Grafo" (clase "btn-primary btn-block").
-  * Sección 2 (Edición Directa): WellPanel explicativo minimalista y una copia del nodo pivote actual.
-  * Sección 3 (Implantación): Slider para el tamaño del clique 'k' (3 a 40), botón "Implantar Clique Aleatorio" (clase "btn-success btn-block") y un 'uiOutput' dinámico llamado "planted_clique_ui".
-  * Sección 4 (Algoritmo): Botón "Buscar Clique Máximo" (clase "btn-warning btn-block") y un 'uiOutput' dinámico llamado "algorithm_monitor_ui".
-- El panel principal se organiza en dos pestañas ('tabsetPanel'):
-  * Pestaña "Vista de Red": aloja un 'visNetworkOutput' ("network_plot") que cubre el 100% de ancho y 100% de alto.
-  * Pestaña "Mapa de Bits (Adyacencia)": aloja un contenedor div (.matrix-plot-container) con un 'plotOutput' ("adjacency_bitmap_plot") cuadrado, que ocupe 100% del alto, y que capture eventos de clic mediante el argumento click = "matrix_click".
+
+Construye la maquetación visual pura utilizando 'fluidPage' y vincula de forma estricta el archivo CSS externo en el encabezado mediante: tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")).
+Implementa un 'sidebarLayout' con un panel lateral (ancho 3, clase "scrollable-sidebar") y un panel principal (ancho 9).
+El panel lateral debe segmentar mediante separadores visuales (hr()) y títulos en negrita cuatro secciones de control:
+Sección 1 (Grafo Erdős-Rényi G(n, p)): Slider de número de vértices (10 a 1000) (por defecto 100), Slider de valor p (0 a 1) (por defecto 0.5) y botón "Regenerar Grafo" (clase "btn-primary btn-block").
+Sección 2 (Edición Directa): Un único párrafo descriptivo minimalista ("Modifica la topología seleccionando nodos individuales. Clickea en un nodo para inspeccionar las conexiones del vértice elegido. Clickea en otro nodo para conectarlos"). Al clickear en un nodo cuando no hay un pivote seleccionado, este nodo se transforma en el pivote, se aislará visualmente la subred local (ego-network), ensombreciendo todos los otros nodos. El nodo seleccionado tendra bordes mas anchos que el resto, y las aristas que conectan ese nodo seran mas gruesas que el resto.
+Sección 3 (Implantación): Slider para el tamaño del clique 'k' (dinámico), botón "Implantar Clique Aleatorio" (clase "btn-success btn-block") y un 'uiOutput' dinámico llamado "planted_clique_ui".
+Sección 4 (Algoritmo): Botón "Buscar Clique Máximo" (clase "btn-warning btn-block"), un 'uiOutput' ("algorithm_monitor_ui") para logs y un 'uiOutput' ("algo_results_ui") para el cuadro de diagnóstico de falsos positivos/negativos.
+
+El panel principal se organiza en dos pestañas ('tabsetPanel'):
+Pestaña "Vista de Red": aloja un 'visNetworkOutput' ("network_plot") que cubre el 100% de ancho y 100% de alto.
+Pestaña "Adyacencia": aloja un 'plotOutput' ("adj_matrix_plot") cuadrado, que cubre el 100% de alto enfocado en rendimiento masivo (Spy Plot).
 
 ==============================================================================
 4. ARCHIVO: server.R
-==============================================================================
-- Implementa la función central 'server <- function(input, output, session)'.
-- CONTROL DE ESTADO CENTRALIZADO: Almacena el grafo activo únicamente dentro de un objeto 'reactiveValues' local (v$nodes, v$edges, v$matrix_trigger) para evitar colisiones de memoria o el uso de súper-asignadores globales (<<-).
-- Inicializa variables reactivas independientes para estados intermedios: active_pivot(), planted_nodes_list(), found_nodes_list(), algo_logs() y algo_running().
-- Configura una regla de negocio básica (observeEvent) para limitar el valor máximo de 'clique_size' según el 'num_vertices' seleccionado.
-- ¡CRÍTICO!: Integra los submódulos de la carpeta 'src/' de forma limpia utilizando la función 'source("ruta", local = TRUE)'. El argumento 'local = TRUE' es obligatorio para que compartan el entorno reactivo del server central.
+
+Implementa la función central 'server <- function(input, output, session)'.
+
+CONTROL DE ESTADO CENTRALIZADO:
+Almacena el grafo activo únicamente dentro de un objeto 'reactiveValues' local (v$nodes, v$edges, v$matrix_trigger).
+Inicializa variables reactivas: active_pivot(), planted_nodes_list(), found_nodes_list(), algo_logs() y algo_running().
+Implementa un 'observeEvent' sobre 'num_vertices' para actualizar el valor sugerido del tamaño del clique (k) en el slider, calculándolo matemáticamente como ceiling(2.5 * sqrt(n)) para evadir el colapso por la ley del semicírculo de Wigner en matrices finitas.
+Genera el renderUI de "algo_results_ui" evaluando el estado de éxito (Verde: recuperado exacto, Amarillo: detección parcial, Rojo: fallo), mostrando aciertos puros, ruido (falsos positivos) y señal perdida (falsos negativos).
+¡CRÍTICO!: Integra los submódulos de la carpeta 'src/' mediante 'source("ruta", local = TRUE)'.
 
 ==============================================================================
 5. ARCHIVOS EN LA CARPETA src/
-==============================================================================
 
 A) src/sub_generate_graph.R:
-- Contiene el 'eventReactive' asociado al botón de regeneración (y la carga inicial con ignoreNULL = FALSE) para crear un grafo basado en el modelo Erdős-Rényi G(n, p) con p = 0.5. Ajusta tamaños de nodos y etiquetas escalados linealmente segun la cantidad de nodos.
-- Renderiza 'output$network_plot' abstrayendo los datos mediante 'isolate(v$nodes)' e 'isolate(v$edges)'. Esto es obligatorio para congelar el layout espacial de las coordenadas físicas y evitar que la red parpadee o se mueva cuando se editen enlaces. Desactiva la física tras 100 iteraciones usando el evento 'stabilizationIterationsDone'. Captura eventos de clics enviando inputs customizados a Shiny ('node_canvas_click' y 'empty_canvas_click').
-- No utilices tooltips al hacer hover sobre un nodo, pero si resalta el nodo con algun color. Utiliza monospace para las etiquetas dentro de los nodos.
-- Al hacer doble-click en un nodo, eliminalo.
--
+Contiene el 'eventReactive' para crear un grafo Erdős-Rényi G(n, p). Ajusta tamaños de nodos y etiquetas.Renderiza 'output$network_plot' abstrayendo los datos con 'isolate()'. Obliga al navegador a calcular 150 ciclos de física en segundo plano antes de renderizar el grafo en pantalla, tan pronto como terminan esos 150 ciclos, esta instrucción en JavaScript desactiva el motor de colisiones y resortes. Configura doble clic para eliminar nodos. Genera logs mostrando las caracteristicas del grafo generado.
 
 B) src/sub_matrix_interaction.R:
-- Al recibir un evento en 'input$matrix_click', recupera los flotantes continuos X/Y y conviértelos mediante redondeo (round()) a los enteros que identifican la posición discreta de las celdas de la grilla de ggplot2 (considerando que el eje Y se grafica invertido para leerse de arriba a abajo).
-- Implementa una lógica simétrica de inversión (Toggle): si la arista ya existe en 'v$edges', bórrala; si no, añádela. Cada arista debe tener un ID compuesto único ("nodoA-nodoB").
-- ¡CRÍTICO!: Para actualizar el grafo visual sin destruir el lienzo ni mover los nodos, interactúa con el frontend utilizando exclusivamente un 'visNetworkProxy' invocando quirúrgicamente 'visUpdateEdges' o 'visRemoveEdges'. Dispara un 'showNotification' si se hace clic en la diagonal principal (auto-lazos).
-- Renderiza 'output$adjacency_bitmap_plot' mapeando la matriz binaria a una grilla completa NxN generada por 'expand.grid'. Píntala con 'geom_tile' (0=Blanco, 1=Negro). Usa la sintaxis nativa limpia 'family = "monospace"' en theme() para las etiquetas de los ejes.
+Renderiza 'output$adj_matrix_plot'. Para soportar grafos de hasta n=1000 sin colapsar el DOM, convierte la matriz de adyacencia de igraph en una matriz dispersa nativa ('sparse = TRUE' y clase 'dgCMatrix'). Usar el método image() que provee el propio paquete Matrix para dibujar un "Spy Plot", donde los puntos oscuros representan aristas (1) y el espacio en blanco representa desconexión (0). Usa 'useRaster = TRUE' para garantizar alta performance de renderizado.
 
 C) src/sub_network_interaction.R:
-- Controla la interacción interactiva nativa del grafo. Al hacer un primer clic en un nodo, se vuelve el pivote activo (cambia su color de fondo a verde neón mediante proxy). Al hacer clic en otros nodos secuencialmente, inyecta aristas hacia ese pivote actualizando el backend y notificando a la matriz. Un clic en el fondo vacío de la red apaga el pivote. Renderiza el texto de 'output$pivot_status'.
+Controla la selección interactiva. Al hacer clic en un nodo, lo vuelve pivote (color verde neón). Clics subsecuentes inyectan aristas hacia el pivote vía 'visNetworkProxy'. Un clic al vacío apaga el pivote.
 
-D) src/sub_algorithms.R:
-- Controla el botón de implantación: selecciona k nodos al azar, calcula sus pares combinatorios (combn) e inyecta las aristas faltantes pintando los elementos de verde claro en pantalla mediante proxy sin alterar el layout espacial.
-- Controla el botón de ejecución del algoritmo: muestra una traza de logs de manera pausada y secuencial volcando texto en la terminal virtual a medida que el algoritmo progresa. Resalta el clique final en color naranja vibrante utilizando el proxy de actualización sobre el grafo estático. Renderiza las UIs dinámicas de los bloques de resultados.
-- Detalle del algoritmo:
-Se implementa un algoritmo espectral para la deteccion del clique oculto propuesto por Alon et al. (1998) en Alon, N., Krivelevich, M., and Sudakov, B. (1998). Finding a large hidden clique in a random graph. Random Structures & Algorithms, 13(3-4):457–466. A grandes razgos consiste en:
-1: Sea A la matriz de adyacencia del grafo observado G = (V, E).
-2: Computar u2 = z/||z|| el segundo vector propio de A.
-3: Sea U ⊆ V el subconjunto de los vertices que corresponden a las k coordenadas de u2 de mayor magnitud.
-4: Q = {i ∈ V : i tiene al menos (3/4)k vecinos en U}.
-Q es la estimacion de la recuperacion del clique.
+D) src/sub_plant_clique.R:
+Controla la inyección del clique oculto. Selecciona k nodos.¡CRÍTICO!: Para evitar duplicación de aristas al calcular diferencias en grafos no dirigidos, extrae todas las combinaciones (combn) y normalízalas usando 'pmin()' y 'pmax()'. Normaliza las aristas existentes del grafo base de igual forma, y utiliza 'anti_join' basándose en estos índices ordenados para inyectar estrictamente las aristas faltantes. Actualiza el lienzo visual sin alterar las coordenadas físicas mediante 'visUpdateEdges' inyectando líneas verdes. Genera logs mostrando las caracteristicas del grafo implantado
 
-Entrega los códigos de los archivos de manera independiente, limpios, extensamente comentados en español línea por línea y listos para producción.
+E) src/sub_run_spectral.R:
+Ejecuta el algoritmo espectral de Alon et al. (1998) adaptado a entornos ruidosos (finitos): Extrae matriz de adyacencia y computa autovalores ('eigen'). Selección de modo dinámico: Evalúa la dispersión (desviación estándar) del vector dominante u1. Si la sd(u1) > 0.05, el bulto de Wigner lo ha contaminado y utiliza u1; de lo contrario usa u2 como estipula la teoría pura. Trunca las coordenadas identificando los k mayores valores absolutos en el conjunto U. Fase de extensión: clasifica un nodo en el conjunto final Q si tiene al menos ceiling((3/4) * k) conexiones hacia el conjunto inicial U. Genera un volcado de logs secuencial mostrando variables internas: nodos colados en U, umbrales, y rechazos (falsos negativos). Resalta los nodos encontrados en borde naranja usando 'visUpdateNodes' al completar el algoritmo.
