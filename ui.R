@@ -26,27 +26,29 @@ ui <- fluidPage(
 
       # SECCIÓN 1: Configuración de la topología inicial del grafo
       h4(tags$b("1. Grafo Base")),
-      sliderInput("num_vertices", "Número de Vértices:", min = 5, max = 205, value = 100, step = 1),
+      sliderInput("num_vertices", "Número de Vértices:", min = 5, max = 1000, value = 100, step = 1),
       actionButton("regenerate_btn", "Regenerar Grafo", class = "btn-primary btn-block", icon = icon("sync")),
 
       hr(), # Separador visual horizontal
 
       # SECCIÓN 2: Panel de información sobre cómo editar el grafo en vivo
       h4(tags$b("2. Edición Directa")),
-      wellPanel(
-        h5(tags$b("Interacción Total:")),
-        p(tags$small("• Pestaña Red: Clic para activar pivote y conectar.")),
-        p(tags$small("• Pestaña Matriz: Haz clic directo en cualquier celda para alternar (conectar/desconectar) aristas.")),
-        p(tags$small("• Nota: No se permiten lazos (auto-conexiones)."))
+      div(
+        # Párrafo condensado (reemplaza las dos descripciones anteriores y elimina "interacción total" y la nota)
+        p("Explora la topología de la red seleccionando nodos individuales. El lienzo aislará visualmente la subred local (ego-network) para inspeccionar las conexiones directas del vértice elegido."),
+
+        # Pivote integrado sin bordes ni márgenes (hereda el estilo del contenedor padre)
+        div(
+          style = "margin-top: 15px; font-weight: bold; color: #333;",
+          uiOutput("pivot_status") # Reemplaza "pivot_ui_output" por el ID exacto que uses para tu pivote
+        )
       ),
-      # Muestra en texto monoespaciado qué nodo está seleccionado para conectar en el lienzo
-      verbatimTextOutput("pivot_status"),
 
       hr(),
 
       # SECCIÓN 3: Configuración del subgrafo completo oculto (Clique Plantado)
       h4(tags$b("3. Implantación")),
-      sliderInput("clique_size", "Tamaño del Clique (k):", min = 5, max = 155, value = 141, step = 1),
+      sliderInput("clique_size", "Tamaño del Clique (k):", min = 5, max = 40, value = 15, step = 1),
       actionButton("plant_random_clique_btn", "Implantar Clique Aleatorio", class = "btn-success btn-block", icon = icon("dice")),
       br(),
       # Contenedor dinámico que mostrará la lista de nodos que forman el clique implantado
@@ -80,7 +82,7 @@ ui <- fluidPage(
                  # Encapsula el gráfico en un contenedor blanco para estilizado CSS
                  div(class = "matrix-plot-container",
                      # Captura las coordenadas exactas de los clics sobre el ggplot2
-                     plotOutput("adjacency_bitmap_plot", width = "900px", height = "850px", click = "matrix_click")
+                     plotOutput("adj_matrix_plot", width = "900px", height = "850px", click = "matrix_click")
                  )
         )
       )

@@ -24,6 +24,16 @@ generate_graph_event <- eventReactive({
   nodo_size <- 11
   fuante_size <- 11
 
+  # IMPRESIÓN DE TELEMETRÍA EN CONSOLA R
+  cat("\n==================================================\n")
+  cat("[LOG] GENERACIÓN DE GRAFO BASE G(n, p)\n")
+  cat("==================================================\n")
+  cat(paste("-> Número de Vértices Solicitados (n):", n_nodes, "\n"))
+  cat(paste("-> Probabilidad del Modelo Denso (p) :", p_proporcional, "\n"))
+  cat(paste("-> Aristas Totales Generadas (m)     :", gsize(g), "\n"))
+  cat(paste("-> Grado Promedio Esperado           :", round(gsize(g) / n_nodes, 2), "\n"))
+  cat("==================================================\n\n")
+
   # Construcción del dataframe de nodos
   nodes_df <- vis_data$nodes %>%
     mutate(id = as.character(id), label = id, size = nodo_size, font.size = fuante_size,

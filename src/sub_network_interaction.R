@@ -55,5 +55,5 @@ observeEvent(input$empty_canvas_click, {
 # Texto de estado del pivote
 output$pivot_status <- renderText({
   pivot <- active_pivot()
-  if(is.null(pivot)) "Pivote: Ninguno" else paste("Pivote Conectando:", pivot)
+  if(is.null(pivot)) "Pivote: Ninguno" else paste("Pivote: ", pivot)
 })

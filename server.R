@@ -19,9 +19,28 @@ server <- function(input, output, session) {
   algo_logs          <- reactiveVal("")
   algo_running       <- reactiveVal(FALSE)
 
-  # Reglas de negocio básicas de los inputs
+  # ==============================================================================
+  # OPTIMIZACIÓN EN server.R: Inicialización del tamaño ideal de Clique
+  # ==============================================================================
   observeEvent(input$num_vertices, {
-    updateSliderInput(session, "clique_size", max = min(input$num_vertices, 15))
+    n <- input$num_vertices
+
+    # Fórmula teórica adaptada: c * sqrt(n) donde c=2 asegura romper el bulto de Wigner
+    ideal_k <- ceiling(2 * sqrt(n))
+
+    # Coeficiente ajustado a 2.5 para mitigar la varianza estadística en n = 100
+    ideal_k <- ceiling(2.5 * sqrt(n))
+
+    # Garantizar que el valor ideal nunca exceda las dimensiones del grafo por seguridad
+    if (ideal_k > n) ideal_k <- n
+
+    # Actualizar dinámicamente el techo y el valor por defecto en la UI
+    updateSliderInput(
+      session,
+      "clique_size",
+      max = n,
+      value = ideal_k
+    )
   })
 
   # 2. INTEGRACIÓN COMPORTAMENTAL MEDIANTE CARGA DETALLADA (source)
@@ -31,5 +50,6 @@ server <- function(input, output, session) {
   source("src/sub_generate_graph.R",        local = TRUE)
   source("src/sub_matrix_interaction.R",    local = TRUE)
   source("src/sub_network_interaction.R",   local = TRUE)
-  source("src/sub_algorithms.R",            local = TRUE)
+  source("src/sub_plant_clique.R",          local = TRUE)
+  source("src/sub_run_spectral.R",          local = TRUE)
 }

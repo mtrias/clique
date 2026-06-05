@@ -45,37 +45,20 @@ observeEvent(input$matrix_click, {
   }
 })
 
-# Renderizado de la matriz de calor discreta binaria (ggplot2)
-output$adjacency_bitmap_plot <- renderPlot({
-  v$matrix_trigger
-  req(v$nodes)
+# Requiere la librería Matrix si no está cargada (library(Matrix))
+output$adj_matrix_plot <- renderPlot({
+  req(v$edges, v$nodes)
 
-  node_ids <- as.integer(v$nodes$id)
-  grid_data <- expand.grid(X = node_ids, Y = node_ids) %>% mutate(Conectado = "0")
+  g_actual <- graph_from_data_frame(d = v$edges, vertices = v$nodes, directed = FALSE)
+  # Extraer matriz dispersa nativa
+  A_sparse <- as_adjacency_matrix(g_actual, sparse = TRUE)
 
-  edges_df <- v$edges
-  if (!is.null(edges_df) && nrow(edges_df) > 0) {
-    e_from <- as.integer(edges_df$from)
-    e_to <- as.integer(edges_df$to)
-
-    hash_grid <- paste(grid_data$X, grid_data$Y, sep = "-")
-    hash_edges_1 <- paste(e_from, e_to, sep = "-")
-    hash_edges_2 <- paste(e_to, e_from, sep = "-")
-
-    grid_data$Conectado[hash_grid %in% hash_edges_1 | hash_grid %in% hash_edges_2] <- "1"
-  }
-
-  grid_data$Conectado[grid_data$X == grid_data$Y] <- "0"
-
-  ggplot(grid_data, aes(x = factor(X), y = factor(Y, levels = rev(sort(node_ids))), fill = Conectado)) +
-    geom_tile(color = "#E0E0E0", linewidth = 0.2) +
-    scale_fill_manual(values = c("0" = "#FFFFFF", "1" = "#000000"), guide = "none") +
-    labs(x = "ID de Vértice (Eje X)", y = "ID de Vértice (Eje Y)") +
-    theme_minimal(base_size = 11) +
-    theme(
-      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, family = "monospace", size = 8),
-      axis.text.y = element_text(family = "monospace", size = 8),
-      panel.grid = element_blank(),
-      axis.ticks = element_line(color = "#888888")
-    )
+  # Renderizar Spy Plot: aristas como puntos negros, ausencia como blanco
+  image(
+    A_sparse,
+    main = paste("Topología de Adyacencia (", vcount(g_actual), "x", vcount(g_actual), ")"),
+    sub = "Los puntos oscuros representan aristas (1). El espacio en blanco es desconexión (0).",
+    col.regions = c("white", "#2B7CE9"),
+    useRaster = TRUE # useRaster es vital para performance en matrices > 500
+  )
 })
