@@ -329,13 +329,13 @@ Distribucion de grados de vertices para $\ger[1/2]{`r n`}$ con clique implantado
 
 ```{r}
 #| label: distribucion-grados-ger-clique-k1
-#| fig.height: 2.8
+#| fig.height: 2.6
 n |> conexiones() |> implantar(k1, FALSE) |> grafo() |> imprimirDistribucionGrados(sprintf("(k=%s)",k1))
 ```
 
 ```{r}
 #| label: distribucion-grados-ger-clique-k2
-#| fig.height: 2.8
+#| fig.height: 2.6
 n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrados(sprintf("(k=%s)",k2))
 ```
 
@@ -350,7 +350,8 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 
 ## Alon, 1998
 
-Algoritmo de clustering espectral y asegura una deteccion exacta en tiempo polinomial si $k = O(√n)$.
+Algoritmo de clustering espectral. Asegura una deteccion exacta en tiempo polinomial si $k = O(√n)$
+<br>
 
 Sea $A$ la matriz de adyacencia de $\ger{n}$
 
@@ -458,6 +459,7 @@ Para que la suma de cero, todos los otros valores deben ser negativos. No necesi
 ## Algoritmo
 
 Sea $A$ la matriz de adyacencia de $\ger{n}$
+
 1. Calculamos $v_2$
 2. Ordeno las coordenadas de $v_2$ de mayor a menor
 3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
@@ -539,17 +541,17 @@ A es una realizacion de E(A) pero el analisis espectral vale igual
 
 ## Referencias
 
+Manuel H. (2021). Detección de un k-subgrafo denso en un grafo aleatorio. https://www.fcea.udelar.edu.uy/institucional/agenda/5385-seminario-del-iesta-3.html
+
 Alon, N., Krivelevich, M., and Sudakov, B. (1998). Finding a large hidden clique in a random graph. Random Structures & Algorithms, 13(3-4):457–466.
 
-Kuˇcera, L. (1995). Expected complexity of graph partitioning problems. Discrete Applied Mathematics, 57(2-3):193–212.11
+Kucera, L. (1995). Expected complexity of graph partitioning problems. Discrete Applied Mathematics, 57(2-3):193–212.11
 
 Lei, J., Rinaldo, A., et al. (2015). Consistency of spectral clustering in stochastic block models. Annals of Statistics, 43(1):215–237.
 
 Lugosi, G. (2017). Lectures on combinatorial statistics. 47th Probability Summer School, Saint-Flour, pages 1–91.
 
 Roughgarden, T. (2017). Cs264: Beyond worst-case analysis lectures# 9 and 10: Spectral algorithms for planted bisection and planted clique.
-
-Manuel H. (2021). Detección de un k-subgrafo denso en un grafo aleatorio. https://www.fcea.udelar.edu.uy/institucional/agenda/5385-seminario-del-iesta-3.html
 
 ```{r}
 ## Diagnostico
