@@ -6,3 +6,8 @@ svg.mermaid-js {
   max-width: 100% !important;
   width: 100% !important;
 }
+
+/* Ocultar todas las leyendas de figuras en RevealJS */
+p.caption {
+  display: none !important;
+}

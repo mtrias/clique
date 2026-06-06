@@ -19,6 +19,7 @@ library(ggplot2)
 
 CONEXIONES_CLIQUE_NO_ALEATORIO <- c(1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 5,6, 4,6, 5,7, 6,7, 6,8)
 CONEXIONES_CLIQUE_ALEATORIO <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8)
+COLOR = "#116699"
 
 # Fachada para construir grafos
 grafo <- function(conexiones) {
@@ -37,11 +38,11 @@ imprimirGrafo <- function(grafo) {
     grafo, 
     layout = layout_with_kk(g),
     vertex.color = "#e6f2ff",          
-    vertex.frame.color = "#116699",    
+    vertex.frame.color = COLOR,    
     vertex.label.color = "#333",    
     vertex.label.family = "sans",    
     vertex.size = 25,                
-    edge.color = "#116699",            
+    edge.color = COLOR,            
     edge.width = 2,
     # Reducir aún más el bounding box interno de igraph
     margin = .1
@@ -58,8 +59,8 @@ imprimirAdyacencia <- function(a) {
     a,
     main = "Matriz de Adyacencia",
     sub = sprintf("(n = %d)", nFilas),
-    #xlab = "Vértices",
-    #ylab = "Vértices",
+    xlab = "",
+    ylab = "",
     
     # TRUE es mas rapido, pero invierte el eje "y" para matrices grandes
     # FALSE es mas lento, no invierte el eje, pero genera un efecto de aliasing
@@ -89,23 +90,25 @@ imprimirAdyacencia <- function(a) {
 
 grados <- function(grafo) {
   #calcula el número de aristas incidentes
-  grados <- degree(grafo, mode = "all")
-  return(grados)
+  degree(grafo, mode = "all")
 }
 
 imprimirDistribucionGrados <- function(grafo) {
-  vector_grados <- grados(g)
-  df_grados <- data.frame(Grado = vector_grados)
-  ggplot(df_grados, aes(x = Grado)) +
+  data.frame(
+    Grado = grados(grafo)
+  ) |>
+  ggplot(aes(x = Grado)) +
     geom_bar(
-      fill = "#116699",
+      fill = COLOR,
       color = "white",
       width = 1
     ) +
     labs(
       title = "Distribución del Grado de los Vértices",
-      x = "Grado (Número de conexiones)",
-      y = "Frecuencia (Cantidad de vértices)"
+      x = element_blank(),
+      y = element_blank(),
+      #x = "Grado (# conexiones)",
+      #y = "Frecuencia (# vértices)"
     ) +
     theme_minimal() +
     theme(
@@ -175,7 +178,72 @@ implantar <- function(conexiones, k, positionRandom = TRUE) {
   return(vector_final)
 }
 
+# Ordenar los grados de los vértices según su importancia espectral (Vector Propio)
+rankingVertices <- function(g, ev) {
+  
+  # 1. Obtener el grado topológico de cada vértice del grafo.
+  # degree() devuelve un vector numérico con la cantidad de aristas incidentes,
+  # indexado por el orden interno de los vértices en la estructura de igraph (del 1 al n).
+  vectorGrados <- degree(g)
+  
+  # 2. Calcular el ranking (índices) basado en el vector propio.
+  # El vector propio principal (ev) derivado de la matriz de adyacencia
+  # representa matemáticamente la Centralidad de Vector Propio (Eigenvector Centrality).
+  # La función order() no ordena el vector 'ev' per se, sino que retorna un vector con las posiciones
+  # originales de los elementos, ordenadas según su valor numérico.
+  # Se utiliza decreasing = TRUE para que el vértice más "central" (mayor valor) quede en la posición 1.
+  ############
+  # DUDA: si ordeno lo por ev, los nodos del clique se ven al final del grafo porque el vector propio -ev es el mismo pero cambiado de sentido. Sin embargo, segun gemini deberia ordenar por abs(ev), pero creo que se equivoca
+  indicesOrdenados <- order(ev*(-1), decreasing = TRUE)
+  
+  # 3. Aplicar el ranking al vector de grados.
+  # Se extraen los valores de 'vectorGrados' siguiendo estrictamente el orden espectral obtenido.
+  # Así, el primer elemento del vector resultante será el grado del vértice con la mayor coordenada en 'ev'.
+  gradosOrdenados <- vectorGrados[indicesOrdenados]
+  
+  return(gradosOrdenados)
+}
+
+# Visualizar la relación entre la centralidad espectral y el grado del vértice
+graficarRankingVertices <- function(g, ev) {
+  
+  # 1. Obtener el vector de grados ordenado algebraicamente llamando a la función anterior.
+  gradosRanking <- rankingVertices(g, ev)
+  
+  # 2. Estructurar los datos en un data.frame requerido por la gramática de ggplot2.
+  # 'Indice' representa la posición en el ranking espectral (eje X).
+  # 'Grado' representa el número real de conexiones de ese vértice (eje Y).
+  df_ranking <- data.frame(
+    Indice = 1:length(gradosRanking),
+    Grado = gradosRanking
+  )
+  
+  # 3. Construir el objeto gráfico subyacente.
+  # Se utiliza geom_line() para visualizar la tendencia matemática global de la red. 
+  # Si el grafo sigue una topología de ley de potencias (redes libres de escala) o tiene un clique 
+  # fuertemente conectado, la línea mostrará una caída logarítmica o escalonada pronunciada.
+  p <- ggplot(df_ranking, aes(x = Indice, y = Grado)) +
+    geom_line(color = "#116699", linewidth = .5) + 
+    labs(
+      title = sprintf("Correlación Grado del Vertice segun Espectro (n=%d)", length(gradosRanking)),
+      subtitle = "Vértices ordenados descendentemente por coordenada asociada en el Vector Propio",
+      x = "Vertices Ordenados por Ranking Espectral en v2",
+      y = "Grado del Vértice"
+    ) +
+    # Permitimos que ggplot calcule los saltos del eje X dinámicamente para evitar superposición de texto
+    scale_x_continuous(n.breaks = 10) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(), # Limpia el ruido visual de las líneas fraccionales
+      plot.title = element_text(face = "bold")
+    )
+  
+  # 4. Renderizar el gráfico en el dispositivo activo.
+  print(p)
+}
 ```
+
+
 
 ## Motivacion
 
@@ -183,11 +251,13 @@ implantar <- function(conexiones, k, positionRandom = TRUE) {
 - Correlacion de activos de una cartera
 - Deteccion de bots en redes sociales
 - Deteccion de ataques informaticos
-- Plegado de proteinas
+- Proteinas / Genes
 
 ::: {.notes}
 - Breve explicacion de cada uno de los problemas.
 :::
+
+
 
 ## Grafos
 
@@ -197,7 +267,7 @@ implantar <- function(conexiones, k, positionRandom = TRUE) {
 :::
 
 ::: {.column width="50%"}
-$\mathcal{G}(V, E)$
+$G(V, E)$
 
 $E = \{ 1, \dots, n \}$
 
@@ -210,6 +280,8 @@ $V = \{ (i,j) \quad i \ne j \}$
 - No direccionado
 - Concepto: orden de un nodo
 :::
+
+
 
 ## Matriz de Adyacencia
 
@@ -228,6 +300,8 @@ $$ A = \matrizAdySimple $$
 - Simetrica
 - a_ii = 0
 :::
+
+
 
 ## Motivacion (revisitado)
 
@@ -249,27 +323,48 @@ $$ A = \matrizAdySimple $$
 - \theta frontera aceptable de correlacion => Matriz de ceros y unos
 :::
 
-## Grafos de Erdos-Renyi 
 
-$\mathcal{G}(n,p)$
 
+## Grafos de Erdős-Rényi
+
+- $\mathcal{G}(n,p)$
 - Tamaño $n$
 - Aristas $~Ber(p)$
 - Orden de un nodo $~Bin(n-1, p)$
+
+```{r}
+#| label: distribucion-grados-ger-sin-clique
+#| fig.height: 3
+n <- 800
+conx <- conexiones(n)
+ger <- grafo(conx)
+imprimirDistribucionGrados(ger)
+```
 
 ::: {.notes}
 - Nos interesa el caso:
 - p=.5 (maxima entropia)
 - n grande
+- ejemplo: n = `r n` sin clique
 :::
 
-## ¿Matriz de Adyacencia de un G(n,p)?
 
-::: {.incremental}
-INSERTAR IMAGENES DEPENDIENDO DE P
-:::
+
+## Matriz de Adyacencia de un G(n,p)
+
+```{r}
+#| label: fig-adyacencia-ger-np
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 6
+400 |> conexiones() |> grafo() |> adyacencia() |> imprimirAdyacencia()
+```
+
+
 
 ## ¿Que es un Clique ?
+
+Un Subgrafo Completo Maximal
 
 ```{r}
 #| label: fig-clique-1
@@ -278,25 +373,25 @@ INSERTAR IMAGENES DEPENDIENDO DE P
 #| fig-height: 4
 #| echo: false
 #| eval: true
-
 g <- grafo(CONEXIONES_CLIQUE_ALEATORIO)
 imprimirGrafo(g)
 ```
 
 ::: {.notes}
 - Comunidad / Pandilla
-- Subgrafo
-- Completo
-- Maximal (1,2,3,4) (5,6,7)
-- Ojo: Maximal $\neq$ Maximo (5,6,7)
+- Subgrafo Completo Maximal
+- Si:(2,3,5,6) No:(1,4,7)
+- Ojo: Maximal $\neq$ Maximo
 :::
+
+
 
 ## Clique aleatorio en A
 
 ```{r}
 g <- grafo(CONEXIONES_CLIQUE_ALEATORIO)
+A <- adyacencia(g)
 ```
-
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -314,7 +409,7 @@ imprimirGrafo(g)
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(adyacencia(g))
+imprimirAdyacencia(A)
 ```
 :::
 :::
@@ -327,8 +422,8 @@ imprimirAdyacencia(adyacencia(g))
 
 ```{r}
 g <- grafo(CONEXIONES_CLIQUE_NO_ALEATORIO)
+A <- adyacencia(g)
 ```
-
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -346,13 +441,14 @@ imprimirGrafo(g)
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(adyacencia(g))
+imprimirAdyacencia(A)
 ```
 :::
 :::
 
 ::: {.notes}
 - No se ve a menos que reordenemos columnas
+- Observar que el clique es informacion de rango 1
 :::
 
 
@@ -362,9 +458,6 @@ imprimirAdyacencia(adyacencia(g))
 ```{r}
 n=200
 k=40
-er = conexiones(n)
-er_clique_aleatorio = implantar(er, k, TRUE)
-er_clique_no_aleatorio = implantar(er, k, FALSE)
 ```
 
 Matrices $G(n=`r n`, p=.5)$ con clique implantado de tamaño $k=`r k`$, en posicion aleatoria (izquierda) y fija (derecha)
@@ -375,7 +468,7 @@ Matrices $G(n=`r n`, p=.5)$ con clique implantado de tamaño $k=`r k`$, en posic
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(adyacencia(grafo(er_clique_aleatorio)))
+n |> conexiones() |> implantar(k, TRUE) |> grafo() |> adyacencia() |> imprimirAdyacencia()
 ```
 :::
 
@@ -384,20 +477,18 @@ imprimirAdyacencia(adyacencia(grafo(er_clique_aleatorio)))
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(adyacencia(grafo(er_clique_no_aleatorio)))
+n |> conexiones() |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia()
 ```
 :::
 :::
 
 
-## Clique en A del mundo real
+## Clique (grande) en A del mundo real
 
 ```{r}
 n=200
 k=150
-er = conexiones(n)
-er_clique_aleatorio = implantar(er, k, TRUE)
-er_clique_no_aleatorio = implantar(er, k, FALSE)
+conx = conexiones(n)
 ```
 
 Matrices $G(n=`r n`, p=.5)$ con clique implantado de tamaño $k=`r k`$, en posicion aleatoria (izquierda) y fija (derecha)
@@ -408,7 +499,7 @@ Matrices $G(n=`r n`, p=.5)$ con clique implantado de tamaño $k=`r k`$, en posic
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(adyacencia(grafo(er_clique_aleatorio)))
+conx |> implantar(k, TRUE) |> grafo() |> adyacencia() |> imprimirAdyacencia()
 ```
 :::
 
@@ -417,7 +508,7 @@ imprimirAdyacencia(adyacencia(grafo(er_clique_aleatorio)))
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(adyacencia(grafo(er_clique_no_aleatorio)))
+conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia()
 ```
 :::
 :::
@@ -430,82 +521,224 @@ imprimirAdyacencia(adyacencia(grafo(er_clique_no_aleatorio)))
 
 
 
-## Kucera 1995
-
-Distribucion de grados de vertices
-: $k = O(\sqrt{n\log n})$
+## Kucera, 1995
 
 ```{r}
-n=200
-k=40
+n=800
+k1=80
+k2=180
 ```
 
+Distribucion de grados de vertices para n=$`r n`$ y k=$`r k1`, `r k2`$
 
 ```{r}
-#| label: distribucion-grados-ger-clique-aleatorio
-cons = implantar(conexiones(n), k, TRUE)
-ger <- grafo(cons)
-imprimirDistribucionGrados(ger)
+#| label: distribucion-grados-ger-clique-k1
+#| fig.height: 2.8
+n |> conexiones() |> implantar(k1, FALSE) |> grafo() |> imprimirDistribucionGrados()
 ```
 
 ```{r}
-#| label: distribucion-grados-ger-clique-fijo
-cons = implantar(conexiones(n), k, FALSE)
-ger <- grafo(cons)
-imprimirDistribucionGrados(ger)
+#| label: distribucion-grados-ger-clique-k2
+#| fig.height: 2.8
+n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrados()
 ```
 
-
-## Diagnostico 1
-
-```{r}
-cons = implantar(conexiones(n), k, FALSE)
-ger <- grafo(cons)
-vector_grados <- grados(ger)
-df_grados <- data.frame(Grado = vector_grados)
-df_grados
-```
-
-## Diagnostico 2
-
-```{r}
-
-ggplot(df_grados, aes(x = Grado)) +
-    geom_bar(
-      fill = "#116699",
-      color = "white",
-      width = 1
-    ) +
-    labs(
-      title = "Distribución del Grado de los Vértices",
-      x = "Grado (Número de conexiones)",
-      y = "Frecuencia (Cantidad de vértices)"
-    ) +
-    theme_minimal() +
-    theme(
-      panel.grid.minor = element_blank()
-    )
-
-grados <- degree(ger)
-summary(grados)
-cat("Número de nodos:", vcount(ger), "\n")
-cat("Número de aristas:", ecount(ger), "\n")
-```
+::: {.notes}
+- grados ~Bin(n-1, 1/2)
+:::
 
 
 
-## Historia (2)
+## Lugosi, 2017
 
-Alon 1998
-$k=O(\sqrt n)$
-
-Lugosi 2017
-: El numero de cliques de tamaño $k$ de $\erMatrix[1/2]$ tiende a estar entre dos numeros enteros $m$ y $m+1$.
+El numero de cliques de tamaño $k$ de $\erMatrix[1/2]$ tiende a estar entre dos numeros enteros $m$ y $m+1$.
 
 Entonces, si buscamos un clique de tamaño $k < m$ sera indistinguible del ruido aleatorio
 
 
-## Analisis
 
-- $A^* = E(A)$
-- Vectores propios
+## Alon, 1998
+
+Sea $A$ la matriz de adyacencia de $\erMatrix$
+
+$$
+E(A) = \begin{pmatrix}
+1/2 & \dots & 1/2 \\
+\vdots & \ddots & \vdots \\
+1/2 & \dots & 1/2
+\end{pmatrix}
+$$
+
+::: {.notes}
+- Grado esperado de cualquier vertice es n - 2
+:::
+
+
+
+## Alon 1998
+
+$k=O(\sqrt n)$
+
+¿Como cambia $E(A)$ si implanto un clique de tamaño $k$? 
+
+$$
+A^* = E(A) = \begin{pmatrix}
+1      & \dots  & 1      & \half  & \dots & \half  \\
+\vdots & \ddots & \vdots & \vdots &       & \vdots \\
+1      & \dots  & 1      & \half  & \dots & \half  \\
+\half  & \dots  & \half  & \half  & \dots & \half  \\
+\vdots & \ddots & \vdots & \vdots & \ddots & \half  \\
+\half  & \dots  & \half  & \half  & \dots & \half  \\
+\end{pmatrix}
+$$
+
+::: {.notes}
+- Grado esperado de los vertices del clique: k - 1
+:::
+
+## Espectro de $E(A)$
+
+- Simetrica
+- $\lambda_i \in \mathbb{R}$
+- Autovectores Ortogonales
+
+
+
+## Espectro de $E(A)$
+
+$$
+\begin{align}
+& \ones = (1, \dots, 1)^\top \\
+& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
+& E(A) \cdot \ones = \frac{n}{2} \ones \\
+& u_1 = \ones \qquad \lambda_1 = n/2
+\end{align}
+$$
+
+
+
+## Espectro de $E(A)$
+
+Clique de tamaño $k$ es $A_c = \{1\}^{k \times k}$ (matriz de unos, tamaño $k$)
+
+$$
+\begin{align}
+& A_c \cdot \ones_k = (k-1)\ones_k \approx k\ones_k
+\end{align}
+$$
+Para la matriz completa $A \in n\times n$ usamos el coeficiente de Rayleigh $R(A,x) = \frac{x^\top Ax}{x^\top x}$ para aproximar autovalores usando autovectores de prueba. 
+
+Probamos con un vector $v_c$ que tiene $1$ en las posiciones del clique y $0$ en caso contrario.
+
+$x^\top x = k$
+
+$x^\top Ax \approx k(k-1) \approx k^2$
+
+$R(A, v_c) \approx k^2/k = k$
+
+
+
+## Espectro de $E(A)$
+
+Como sus vectores son ortogonales, el otro autovector $u_2$ de autovalor $k$ es ortogonal a $u_1$
+
+$$ 0 = \langle u_1, u_2 \rangle = u_1^\top u_2 =  \sum_i (u_1)_i \cdot (u_2)_i = \sum_i (u_2)_i $$
+
+::: {.callout-note}
+- se sabe que es de los valores propios mas grandes?
+:::
+
+Concluimos que $v_2$ asigna valores grandes a los $k$ vertices del clique.
+
+Para que la suma de cero, todos los otros valores deben ser negativos. No necesitan ser gigantes porque hay muchos mas nodos fuera del clique $(n-k)$ que dentro de el, pero empuja los coeficientes del clique hacia los positivos.
+
+::: {.notes}
+- v es autovector (amplifica)
+- y a la vez sus coordenadas suman 0
+- maximizan la forma cuadratica x^TAx >> 0
+:::
+
+
+
+## Wigner
+
+::: {.callout-note}
+Teorema
+: Los otros autovalores de la matriz estan acotados por $\sqrt(n)$
+:::
+
+
+
+## Que pasa si $k$ es muy grande ?
+
+- Alon: $k > \sqrt{n\log n}$ y $k < n/2$
+
+La señal del clique pasa a ser mas importante que el ruido
+El clique se desplaza al autovector principal
+
+|           | $\lambda_1$        | $\lambda_2$        | Autovector Clique |
+|-----------|--------------------|--------------------|-------------------|
+| $k < n/2$ | $n/2$ <br> `Ruido` | $k$ <br> `Clique`  | $v_2$             |
+| $k > n/2$ | $k$ <br> `Clique`  | $n/2$ <br> `Ruido` | $v_1$             |
+
+
+
+## Algoritmo
+
+1. Calculo $v_2$
+2. Ordeno las coordenadas de $v_2$ de mayor a menor
+3. Los primeros k coeficientes deberian ser los correspondientes a los vertices del clique
+
+## Verificacion
+
+¿Como puedo saber que tengo los vertices del clique?
+
+```{r}
+#| label: espectro-eigenvector
+#| fig.height: 4
+n = 800
+k = 3 * ceiling(sqrt(n))
+g = n |> conexiones() |> implantar(k, TRUE) |> grafo()
+A = adyacencia(g)
+eig <- eigen(A, symmetric = TRUE)
+v1 <- eig$vectors[, 1]
+v2 <- eig$vectors[, 2]
+
+# Vertices del clique
+#node_indices <- order(v2, decreasing = TRUE)[1:k]
+#U_nodes <- igraph::V(g_calc)$name[node_indices]
+
+graficarRankingVertices(g, v2)
+```
+
+::: {.notes}
+- Las coordenadas del clique estan por encima de las otras
+- Las otras coordenadas estan en torno a n/2
+:::
+
+## Teorema
+
+$A = E(A) + \epsilon$
+A es una realizacion de E(A) pero el analisis espectral vale igual
+
+> El comportamiento de estos autovalores bajo una matriz aleatoria de Wigner perturbada es predecible mediante la Teoría de Perturbaciones de Matrices y está rigurosamente descrito por transiciones de fase espectral (como las estudiadas por Baik, Ben Arous y Péché, conocidas como transiciones BBP). Cuando la perturbación de rango 1 (el clique) supera el umbral crítico que define la masa del semicírculo de valores singulares, el autovector principal se alinea con la perturbación.
+>
+> -- Gemini
+
+::: {.notes}
+- ver documento que mando Manuel con esta justificacion
+:::
+
+
+
+## Fin
+
+
+
+## Diagnostico
+```{r}
+#summary(grados)
+#cat("Número de nodos:", vcount(ger), "\n")
+#cat("Número de aristas:", ecount(ger), "\n")
+```
+

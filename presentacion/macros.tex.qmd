@@ -12,5 +12,9 @@ $$
 }
 
 \newcommand{\erMatrix}[1][p]{\mathcal{G}(n, #1)}
+
+\newcommand{\half}{ ½ }
+
+\newcommand{\ones}{ { \Large \mathbf{1} } }
 $$
 :::

@@ -18,6 +18,8 @@ observeEvent(input$btn_run_algo, {
   u1 <- eig$vectors[, 1]
   u2 <- eig$vectors[, 2]
 
+  # !!!DUDA: si ordeno lo por ev, los nodos del clique se ven al final del grafo porque el vector propio -ev es el mismo pero cambiado de sentido. Sin embargo, segun gemini deberia ordenar por abs(ev), pero creo que se equivoca
+
   # Evaluación empírica de la dispersión de Wigner
   sd_u1 <- sd(abs(u1))
   current_logs <- c(current_logs, sprintf("Dispersión espectral en u1: %.4f", sd_u1))
