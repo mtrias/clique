@@ -68,6 +68,7 @@ jobs:
       - name: Instalar dependencias de R y del Sistema
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          # Agregar mas paquetes necesarios con el formato any::paquete
           packages: |
             any::rmarkdown
             any::knitr
@@ -75,7 +76,6 @@ jobs:
             any::Matrix
             any::igraph
             any::ggplot2
-            # Agregar mas paquetes necesarios con el formato any::paquete
 
       - name: Instalar Quarto
         uses: quarto-dev/quarto-actions/setup@v2
