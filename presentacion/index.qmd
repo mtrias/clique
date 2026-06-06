@@ -48,9 +48,9 @@ source("funciones.R")
 ::: {.column width="50%"}
 $G(V, E)$
 
-$E = \{ 1, \dots, n \}$
+$V = \{ 1, \dots, n \}$
 
-$V = \{ (i,j) \quad i \ne j \}$
+$E = \{ \{i,j\} \quad i,j \in V \}$
 :::
 
 ::: {.column width="50%"}
@@ -61,6 +61,7 @@ $V = \{ (i,j) \quad i \ne j \}$
 ::: {.notes}
 - Breve intro a grafos (si alguien la necesita)
 - No direccionado
+- Sin loops (i != j)
 - Concepto: orden de un nodo
 :::
 
@@ -73,6 +74,8 @@ $V = \{ (i,j) \quad i \ne j \}$
 $$
 \begin{align}
 & A \in \{0,1\}^{n\times n} \\
+& \\
+& A_{ij} = 1 \leftrightarrow \{i,j\} \in E \\
 & \\
 & A = \matrizAdySimple
 \end{align}
@@ -105,10 +108,8 @@ $$ A = \matrizAdySimple $$
 
 ::: {.notes}
 - cada nodo es un activo financiero
-- correlacion positiva => riesgo
-- correlacion negativa => refugio
-- correlacion 0 => diversificacion
-- \theta frontera aceptable de correlacion => Matriz de ceros y unos
+- correlacion de activos como objetivo
+- $\theta$ frontera aceptable de correlacion => Matriz de ceros y unos
 :::
 
 
@@ -308,6 +309,14 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 
 
 
+## Lugosi, 2017
+
+El numero de cliques de tamaño $k$ de $\ger[1/2]{n}$ tiende a estar entre dos numeros enteros consecutivos $m$ y $m+1$ a medida que $n$ crece.
+
+Entonces, si buscamos un clique de tamaño $k < m$ sera indistinguible del ruido aleatorio
+
+
+
 ## Kucera, 1995
 
 ```{r}
@@ -331,20 +340,17 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ```
 
 ::: {.notes}
+- Que tan chico puede ser k?
 - grados ~Bin(n-1, 1/2)
+- k > O(√ (n logn)). 
+- "Si se planta un clique de tamaño k, esperamos que los  ́ertices que lo conforman, incrementen su grado en k/2 (cada v́ertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
 :::
 
 
 
-## Lugosi, 2017
-
-El numero de cliques de tamaño $k$ de $\ger[1/2]{n}$ tiende a estar entre dos numeros enteros $m$ y $m+1$.
-
-Entonces, si buscamos un clique de tamaño $k < m$ sera indistinguible del ruido aleatorio
-
-
-
 ## Alon, 1998
+
+Algoritmo de clustering espectral y asegura una deteccion exacta en tiempo polinomial si $k = O(√n)$.
 
 Sea $A$ la matriz de adyacencia de $\ger{n}$
 
@@ -357,6 +363,7 @@ E(A) = \begin{pmatrix}
 $$
 
 ::: {.notes}
+- La diagonal deberian ser 0 pero eso no cambia el resultado
 - Grado esperado de cualquier vertice es n - 2
 :::
 
@@ -364,12 +371,10 @@ $$
 
 ## Alon 1998
 
-$k=O(\sqrt n)$
-
 ¿Como cambia $E(A)$ si implanto un clique de tamaño $k$? 
 
 $$
-A^* = E(A) = \begin{pmatrix}
+E(A) = \begin{pmatrix}
 1      & \dots  & 1      & \half  & \dots & \half  \\
 \vdots & \ddots & \vdots & \vdots &       & \vdots \\
 1      & \dots  & 1      & \half  & \dots & \half  \\
@@ -380,6 +385,7 @@ A^* = E(A) = \begin{pmatrix}
 $$
 
 ::: {.notes}
+- Rango 2 => 2 autovalores != 0
 - Grado esperado de los vertices del clique: k - 1
 :::
 
@@ -392,6 +398,8 @@ $$
 
 
 ## Espectro de $E(A)$
+
+<br>
 
 $$
 \begin{align}
@@ -447,6 +455,20 @@ Para que la suma de cero, todos los otros valores deben ser negativos. No necesi
 
 
 
+## Algoritmo
+
+Sea $A$ la matriz de adyacencia de $\ger{n}$
+1. Calculamos $v_2$
+2. Ordeno las coordenadas de $v_2$ de mayor a menor
+3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
+
+::: {.callout-note}
+Q = {i ∈ V : i tiene al menos 4k/3 vecinos en U}.
+Justificacion?
+:::
+
+
+
 ## Wigner
 
 ::: {.callout-note}
@@ -469,12 +491,6 @@ El clique se desplaza al autovector principal
 | $k > n/2$ | $k$ <br> `Clique`  | $n/2$ <br> `Ruido` | $v_1$  |
 
 
-
-## Algoritmo
-
-1. Calculo $v_2$
-2. Ordeno las coordenadas de $v_2$ de mayor a menor
-3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
 
 ## Verificacion
 
@@ -520,6 +536,20 @@ A es una realizacion de E(A) pero el analisis espectral vale igual
 
 
 ## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true"}
+
+## Referencias
+
+Alon, N., Krivelevich, M., and Sudakov, B. (1998). Finding a large hidden clique in a random graph. Random Structures & Algorithms, 13(3-4):457–466.
+
+Kuˇcera, L. (1995). Expected complexity of graph partitioning problems. Discrete Applied Mathematics, 57(2-3):193–212.11
+
+Lei, J., Rinaldo, A., et al. (2015). Consistency of spectral clustering in stochastic block models. Annals of Statistics, 43(1):215–237.
+
+Lugosi, G. (2017). Lectures on combinatorial statistics. 47th Probability Summer School, Saint-Flour, pages 1–91.
+
+Roughgarden, T. (2017). Cs264: Beyond worst-case analysis lectures# 9 and 10: Spectral algorithms for planted bisection and planted clique.
+
+Manuel H. (2021). Detección de un k-subgrafo denso en un grafo aleatorio. https://www.fcea.udelar.edu.uy/institucional/agenda/5385-seminario-del-iesta-3.html
 
 ```{r}
 ## Diagnostico

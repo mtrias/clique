@@ -11,6 +11,6 @@ Para sortear esta complejidad algorítmica, estudiamos una solución directa bas
 - Shiny app para visualizar el algoritmo para hallar un clique en un grafo de Erdős-Rényi
 https://miguel-trias.shinyapps.io/clique/
 
-Presentacion Quarto/RevealJS para hablar sobre este problema
+- Presentacion Quarto/RevealJS para hablar sobre este problema en clase
 https://mtrias.github.io/clique
 
