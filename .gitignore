@@ -48,3 +48,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 /presentacion/presentacion_files
+/presentacion/presentacion.html
