@@ -1,0 +1,80 @@
+name: Deploy Slides and App
+
+on:
+  push:
+    branches:
+      - main  # Cambia esto si tu rama principal tiene otro nombre
+  workflow_dispatch:
+
+# Permisos para publicar en GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy-shiny:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Instalar dependencias de R
+        # CRÍTICO: Añade aquí CUALQUIER paquete que tu app Shiny utilice (dplyr, ggplot2, etc.)
+        # rsconnect necesita verlos instalados para generar el manifiesto correctamente.
+        run: |
+          install.packages(c("rsconnect", "shiny", "visNetwork", "igraph", "dplyr"))
+        shell: Rscript {0}
+
+      - name: Desplegar a shinyapps.io
+        env:
+          SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
+          SHINYAPPS_TOKEN: ${{ secrets.SHINYAPPS_TOKEN }}
+          SHINYAPPS_SECRET: ${{ secrets.SHINYAPPS_SECRET }}
+        run: |
+          rsconnect::setAccountInfo(name=Sys.getenv("SHINYAPPS_ACCOUNT"),
+                                    token=Sys.getenv("SHINYAPPS_TOKEN"),
+                                    secret=Sys.getenv("SHINYAPPS_SECRET"))
+          # La app está en la carpeta /shiny
+          rsconnect::deployApp(appDir = "shiny", forceUpdate = TRUE)
+        shell: Rscript {0}
+
+  deploy-quarto-slides:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Renderizar Presentación
+        run: |
+          cd presentacion
+          quarto render
+          # Empaquetar todo en un directorio _site para GitHub Pages
+          cd ..
+          mkdir -p _site
+          mv presentacion/*.html _site/ 2>/dev/null || true
+          mv presentacion/*_files _site/ 2>/dev/null || true
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Subir Artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Desplegar a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
