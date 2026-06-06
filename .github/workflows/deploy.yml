@@ -32,7 +32,7 @@ jobs:
         # Paquetes que la app Shiny necesita
         # rsconnect necesita verlos instalados para generar el manifiesto correctamente.
         run: |
-          install.packages(c("rsconnect", "shiny", "visNetwork", "igraph", "dplyr"))
+          install.packages(c("rsconnect", "shiny", "visNetwork", "igraph", "dplyr", "Matrix"))
         shell: Rscript {0}
 
       - name: Desplegar a shinyapps.io
@@ -62,7 +62,8 @@ jobs:
 
       - name: Instalar dependencias del motor de Quarto
         run: |
-          install.packages(c("rmarkdown", "knitr"))
+          install.packages(c("rmarkdown", "knitr", "Matrix", "igraph", "ggplot2"))
+
         shell: Rscript {0}
 
       - name: Instalar Quarto
