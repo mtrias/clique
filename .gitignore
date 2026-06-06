@@ -47,5 +47,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
-/presentacion/presentacion_files
-/presentacion/presentacion.html
+
+# Ignoro artifacts de presentacion (se generan en Github Actions)
+presentacion/index.html
+/presentacion/index_files

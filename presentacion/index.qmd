@@ -731,8 +731,7 @@ A es una realizacion de E(A) pero el analisis espectral vale igual
 
 
 
-## Fin
-
+## Demo {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true"}
 
 
 ## Diagnostico

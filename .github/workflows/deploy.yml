@@ -29,7 +29,7 @@ jobs:
           use-public-rspm: true
 
       - name: Instalar dependencias de R
-        # CRÍTICO: Añade aquí CUALQUIER paquete que tu app Shiny utilice (dplyr, ggplot2, etc.)
+        # Paquetes que la app Shiny necesita
         # rsconnect necesita verlos instalados para generar el manifiesto correctamente.
         run: |
           install.packages(c("rsconnect", "shiny", "visNetwork", "igraph", "dplyr"))
@@ -45,7 +45,7 @@ jobs:
                                     token=Sys.getenv("SHINYAPPS_TOKEN"),
                                     secret=Sys.getenv("SHINYAPPS_SECRET"))
           # La app está en la carpeta /shiny
-          rsconnect::deployApp(appDir = "shiny", forceUpdate = TRUE)
+          rsconnect::deployApp(appDir = "shiny", appName = "clique", forceUpdate = TRUE)
         shell: Rscript {0}
 
   deploy-quarto-slides:
@@ -59,13 +59,14 @@ jobs:
 
       - name: Renderizar Presentación
         run: |
+          # 1. Entramos a la carpeta y compilamos
           cd presentacion
           quarto render
-          # Empaquetar todo en un directorio _site para GitHub Pages
+
+          # 2. Volvemos a la raíz, creamos _site y copiamos TODO
           cd ..
           mkdir -p _site
-          mv presentacion/*.html _site/ 2>/dev/null || true
-          mv presentacion/*_files _site/ 2>/dev/null || true
+          cp -R presentacion/* _site/
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v4
