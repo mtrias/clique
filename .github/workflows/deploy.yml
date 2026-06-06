@@ -48,26 +48,57 @@ jobs:
           rsconnect::deployApp(appDir = "shiny", appName = "clique", forceUpdate = TRUE)
         shell: Rscript {0}
 
-  deploy-quarto-slides:
+deploy-quarto-slides:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
+      # 1. Configurar R y el engine de evaluación (knitr)
+      - name: Configurar R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Instalar dependencias del motor de Quarto
+        run: |
+          install.packages(c("rmarkdown", "knitr"))
+        shell: Rscript {0}
+
       - name: Instalar Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # 2. Estrategia de compilación In-Place
       - name: Renderizar Presentación
         run: |
-          # 1. Entramos a la carpeta y compilamos
-          cd presentacion
-          quarto render
-
-          # 2. Volvemos a la raíz, creamos _site y copiamos TODO
-          cd ..
           mkdir -p _site
+
+          # Copiar todos los recursos fuente (imágenes, CSS y el .qmd)
           cp -R presentacion/* _site/
 
+          # Cambiar el working directory al directorio de publicación
+          cd _site
+
+          echo "=== Debug: Estado de archivos ANTES de compilar ==="
+          ls -la
+
+          # Compilar el target de manera explícita
+          quarto render index.qmd
+
+          echo "=== Debug: Estado de archivos DESPUÉS de compilar ==="
+          ls -la
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Subir Artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Desplegar a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v4
 
