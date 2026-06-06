@@ -48,7 +48,7 @@ jobs:
           rsconnect::deployApp(appDir = "shiny", appName = "clique", forceUpdate = TRUE)
         shell: Rscript {0}
 
-deploy-quarto-slides:
+  deploy-quarto-slides:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del repositorio
