@@ -37,6 +37,8 @@ source("funciones.R")
 - Deteccion de ataques informaticos
 - Proteinas / Genes
 
+$\vdots$
+
 ::: {.notes}
 - Breve explicacion de cada uno de los problemas.
 :::
@@ -55,7 +57,13 @@ $E = \{ \{i,j\} \quad i,j \in V \}$
 :::
 
 ::: {.column width="50%"}
-{{< include grafo-simple.md >}}
+```{r}
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 6
+g <- grafo(CONX_GRAFO_SIMPLE)
+imprimirGrafo(g)
+```
 :::
 :::
 
@@ -84,7 +92,13 @@ $$
 :::
 
 ::: {.column width="50%"}
-{{< include grafo-simple.md >}}
+```{r}
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 6
+g <- grafo(CONX_GRAFO_SIMPLE)
+imprimirGrafo(g)
+```
 :::
 :::
 
@@ -95,7 +109,7 @@ $$
 
 
 
-## Motivacion (revisitado)
+## Motivacion (bis)
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -103,7 +117,14 @@ $$ A = \matrizAdySimple $$
 :::
 
 ::: {.column width="50%"}
-{{< include grafo-simple.md >}}
+```{r}
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 6
+g <- grafo(CONX_GRAFO_SIMPLE)
+imprimirGrafo(g)
+
+```
 :::
 :::
 
@@ -119,13 +140,13 @@ $$ A = \matrizAdySimple $$
 
 - $\ger{n}$
 - Tamaño $n$
-- Aristas $~Ber(p)$
-- Orden de un nodo $~Bin(n-1, p)$
+- Aristas $\sim Ber(p)$
+- Grado de un nodo $\sim Bin(n-1, p)$
 
 ```{r}
 #| label: distribucion-grados-ger-sin-clique
 #| fig.height: 3
-n <- 800
+n <- 1800
 conx <- conexiones(n)
 ger <- grafo(conx)
 imprimirDistribucionGrados(ger)
@@ -163,7 +184,7 @@ Un Subgrafo Completo Maximal
 #| fig-height: 4
 #| echo: false
 #| eval: true
-g <- grafo(CONEXIONES_CLIQUE_ALEATORIO)
+g <- grafo(CONX_CLIQUE_ALEATORIO)
 imprimirGrafo(g)
 ```
 
@@ -179,7 +200,7 @@ imprimirGrafo(g)
 ## Clique aleatorio en A
 
 ```{r}
-g <- grafo(CONEXIONES_CLIQUE_ALEATORIO)
+g <- grafo(CONX_CLIQUE_ALEATORIO)
 A <- adyacencia(g)
 ```
 
@@ -211,7 +232,7 @@ imprimirAdyacencia(A)
 ## Clique NO aleatorio en A
 
 ```{r}
-g <- grafo(CONEXIONES_CLIQUE_NO_ALEATORIO)
+g <- grafo(CONX_CLIQUE_NO_ALEATORIO)
 A <- adyacencia(g)
 ```
 
@@ -310,23 +331,20 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 
 
 
-## Algo de teoria
-
-Lugosi, 2017
-: El numero esperado de cliques de tamaño $k$ de $\ger[1/2]{n}$ tiende a estar entre dos numeros enteros consecutivos $m$ y $m+1$ a medida que $n$ crece.
+## Algo de teoria sobre $\ger[1/2]{n}$
 
 Roughgarden, p16
-: El numero esperado de cliques de tamaño $k$ es $n^k 2^{-k^2/2}$.
-
-Ese numero vale exactamente $1$ si $k=2\log_2 n$. Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
+: El numero esperado de cliques de tamaño $k$ es $n^k 2^{-k^2/2}$
 
 Roughgarden, p16
 : El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2\log_2{n}$
 
 Conclusion
-> Si $k$ es chico, un clique de tamaño $k$ sera indistinguible del ruido aleatorio.
+: Si $k$ es chico, un clique de tamaño $k$ sera indistinguible del ruido aleatorio.
 
-
+::: {.notes}
+- Ese numero vale exactamente $1$ si $k=2\log_2 n$. Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
+:::
 
 ## Kucera, 1995
 
@@ -374,12 +392,12 @@ E(A) = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-### Señal + Ruido
-$$A = E(A) + \epsilon$$
+A = Señal + Perturbacion
+: $$A = E(A) + P$$
 
 ::: {.notes}
 - La diagonal deberian ser 0 pero eso no cambia el resultado
-- Grado esperado de cualquier vertice es n - 2
+- Grado esperado de cualquier vertice es n-1 / 2
 :::
 
 
@@ -401,14 +419,19 @@ $$
 
 ::: {.notes}
 - Rango 2 => 2 autovalores != 0
-- si no hubiera clique el rango seria 1
-- (clique agrega perturbacion de grado 1)
+- Si no hubiera clique el rango seria 1
+- Clique "agrega perturbacion de grado 1"
 - Grado esperado de los vertices del clique: k - 1
 :::
 
+
+
 ## Espectro de $E(A)$
 
-- Simetrica
+<br>
+
+Simetrica $\implies$
+
 - $\lambda_i \in \mathbb{R}$
 - Autovectores Ortogonales
 
@@ -418,43 +441,59 @@ $$
 
 <br>
 
-Las sumas de todas las filas son $\approx$constantes. Entonces, el vector de unos es un $\approx$autovector.
-
-$$
+::: {.columns}
+::: {.column width="60%"}
 \begin{align}
-& \ones = (1, \dots, 1)^\top \\
+& \ones = (1, \dots, 1)^\top \\ 
+\\
 & \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
 & E(A) \cdot \ones \approx \frac{n}{2} \ones \\
+\\
 & u_1 \approx \ones \qquad \lambda_1 \approx n/2
 \end{align}
-$$
+:::
+
+::: {.column width="40%"}
+Las sumas de todas las filas son $\approx$ constantes.
+
+Entonces, el vector de unos es un $\approx$ autovector.
+:::
+:::
+
 ::: {.notes}
-- \lambda_1 representa el promedio de conexiones en el grafo
+- λ1 representa el promedio de conexiones en el grafo
 :::
 
 
 
 ## $v_2$ Segundo autovector de $E(A)$
 
-$$
+::: {.columns}
+::: {.column width="65%"}
+
 \begin{align}
-& v_1 \perp v_2 \\
-\\
-& 0 = \langle v_1, v_2 \rangle = v_1^\top v_2 =  \sum_i (v_1)_i \cdot (v_2)_i = \sum_i (v_2)_i \\
+ & v_1 \perp v_2 \\
+ \\
+ & 0 = \langle v_1, v_2 \rangle = v_1^\top v_2 =  \sum_i (v_1)_i \cdot (v_2)_i = \sum_i (v_2)_i \\
 
-& w = (n-k, \dots, n-k, \quad -k, \dots, -k) \\
+ & w = (n-k, \dots, n-k, \quad -k, \dots, -k) \\
 
-&\sum_i w_i = 0 \\
+ & \sum_i w_i = 0 \\
 
-& E(A) \cdot w = k w \\
-\\
-& v_2 \approx w \qquad \lambda_2 \approx k/2
+ & E(A) \cdot w = k w \\
+ \\
+ & v_2 \approx w \qquad \lambda_2 \approx k/2
 \end{align}
-$$
 
-Concluimos que $v_2$ asigna valores grandes a los $k$ vertices del clique.
+:::
 
+::: {.column width="35%"}
 Para que la suma de cero, todos los otros valores deben ser negativos. No necesitan ser gigantes porque hay muchos mas nodos fuera del clique $(n-k)$ que dentro de el, pero empuja los coeficientes del clique hacia los positivos.
+
+**$v_2$ asigna valores grandes a los $k$ vertices del clique.**
+
+:::
+:::
 
 ::: {.notes}
 - la señal E(A) se cancela al multiplicar por v_2

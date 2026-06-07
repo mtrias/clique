@@ -1,5 +1,8 @@
-CONEXIONES_CLIQUE_NO_ALEATORIO <- c(1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 5,6, 4,6, 5,7, 6,7, 6,8)
-CONEXIONES_CLIQUE_ALEATORIO <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8)
+CONX_CLIQUE_NO_ALEATORIO <- c(1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 5,6, 4,6, 5,7, 6,7, 6,8)
+CONX_CLIQUE_ALEATORIO <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8)
+CONX_GRAFO_SIMPLE <- c(1,3, 1,5, 2,4, 3,6, 4,5, 5,6)
+
+
 COLOR = "#116699"
 
 # Fachada para construir grafos
@@ -38,8 +41,8 @@ imprimirAdyacencia <- function(a, extraInfo="") {
   nFilas <- nrow(a)
   img <- image(
     a,
-    main = "Matriz de Adyacencia",
-    sub = sprintf("(n = %d) %s", nFilas, extraInfo),
+    main = sprintf("Matriz de Adyacencia (n = %d)", nFilas),
+    sub = extraInfo,
     xlab = "",
     ylab = "",
 

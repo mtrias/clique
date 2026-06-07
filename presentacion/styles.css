@@ -11,3 +11,17 @@ svg.mermaid-js {
 p.caption {
   display: none !important;
 }
+
+
+.slide ul li::marker {
+  color: #116699;
+  font-size: .8em; /* Ajusta este valor para el tamaño del círculo */
+}
+
+/* Forzar que los títulos de las slides sean negros */
+.slide h1,
+.slide h2,
+.slide h3,
+.slide h4 {
+  color: #116699 !important;
+}
