@@ -79,6 +79,14 @@ imprimirDistribucionGrados <- function(grafo, extraTitle="") {
     Grado = grados(grafo)
   ) |>
     ggplot(aes(x = Grado)) +
+    # Se ve mas linda, pero no es la que usa Kucera?
+    # agregar al aes: , x=nodo
+    # agregar al DF: nodo = 1:vcount(grafo)
+    #geom_point(
+    #  fill = COLOR,
+    #  color = COLOR,
+    #  width = 1
+    #) +
     geom_bar(
       fill = COLOR,
       color = "white",

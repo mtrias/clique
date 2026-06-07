@@ -5,6 +5,7 @@ format:
   revealjs:
     center: false
     css: styles.css
+    slide-number: true
 ---
 
 {{< include macros.tex.qmd >}}
@@ -309,11 +310,21 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 
 
 
-## Lugosi, 2017
+## Algo de teoria
 
-El numero de cliques de tamaño $k$ de $\ger[1/2]{n}$ tiende a estar entre dos numeros enteros consecutivos $m$ y $m+1$ a medida que $n$ crece.
+Lugosi, 2017
+: El numero esperado de cliques de tamaño $k$ de $\ger[1/2]{n}$ tiende a estar entre dos numeros enteros consecutivos $m$ y $m+1$ a medida que $n$ crece.
 
-Entonces, si buscamos un clique de tamaño $k < m$ sera indistinguible del ruido aleatorio
+Roughgarden, p16
+: El numero esperado de cliques de tamaño $k$ es $n^k 2^{-k^2/2}$.
+
+Ese numero vale exactamente $1$ si $k=2\log_2 n$. Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
+
+Roughgarden, p16
+: El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2\log_2{n}$
+
+Conclusion
+> Si $k$ es chico, un clique de tamaño $k$ sera indistinguible del ruido aleatorio.
 
 
 
@@ -340,17 +351,17 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ```
 
 ::: {.notes}
+- "Si se planta un clique de tamaño k, esperamos que los vertices que lo conforman, incrementen su grado en $k-1/2$ (cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
+- Grados fuera del clique ~Bin(n-1, 1/2) ancho distribucion √(n log n) (TLC)
 - Que tan chico puede ser k?
-- grados ~Bin(n-1, 1/2)
-- k > O(√ (n logn)). 
-- "Si se planta un clique de tamaño k, esperamos que los  ́ertices que lo conforman, incrementen su grado en k/2 (cada v́ertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
+- k > √ c(n log(n)). 
 :::
 
 
 
 ## Alon, 1998
 
-Algoritmo de clustering espectral. Asegura una deteccion exacta en tiempo polinomial si $k = O(√n)$
+Algoritmo de clustering espectral. Asegura una deteccion exacta en tiempo polinomial si $k = \Omega(\sqrt n)$
 <br>
 
 Sea $A$ la matriz de adyacencia de $\ger{n}$
@@ -362,6 +373,9 @@ E(A) = \begin{pmatrix}
 1/2 & \dots & 1/2
 \end{pmatrix}
 $$
+
+### Señal + Ruido
+$$A = E(A) + \epsilon$$
 
 ::: {.notes}
 - La diagonal deberian ser 0 pero eso no cambia el resultado
@@ -387,6 +401,8 @@ $$
 
 ::: {.notes}
 - Rango 2 => 2 autovalores != 0
+- si no hubiera clique el rango seria 1
+- (clique agrega perturbacion de grado 1)
 - Grado esperado de los vertices del clique: k - 1
 :::
 
@@ -398,61 +414,65 @@ $$
 
 
 
-## Espectro de $E(A)$
+## $v_1$ Primer Autovector $E(A)$
 
 <br>
+
+Las sumas de todas las filas son $\approx$constantes. Entonces, el vector de unos es un $\approx$autovector.
 
 $$
 \begin{align}
 & \ones = (1, \dots, 1)^\top \\
 & \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
-& E(A) \cdot \ones = \frac{n}{2} \ones \\
-& u_1 = \ones \qquad \lambda_1 = n/2
+& E(A) \cdot \ones \approx \frac{n}{2} \ones \\
+& u_1 \approx \ones \qquad \lambda_1 \approx n/2
 \end{align}
 $$
+::: {.notes}
+- \lambda_1 representa el promedio de conexiones en el grafo
+:::
 
 
 
-## Espectro de $E(A)$
-
-Clique de tamaño $k$ es $A_c = \{1\}^{k \times k}$ (matriz de unos, tamaño $k$)
+## $v_2$ Segundo autovector de $E(A)$
 
 $$
 \begin{align}
-& A_c \cdot \ones_k = (k-1)\ones_k \approx k\ones_k
+& v_1 \perp v_2 \\
+\\
+& 0 = \langle v_1, v_2 \rangle = v_1^\top v_2 =  \sum_i (v_1)_i \cdot (v_2)_i = \sum_i (v_2)_i \\
+
+& w = (n-k, \dots, n-k, \quad -k, \dots, -k) \\
+
+&\sum_i w_i = 0 \\
+
+& E(A) \cdot w = k w \\
+\\
+& v_2 \approx w \qquad \lambda_2 \approx k/2
 \end{align}
 $$
-Para la matriz completa $A \in n\times n$ usamos el coeficiente de Rayleigh $R(A,x) = \frac{x^\top Ax}{x^\top x}$ para aproximar autovalores usando autovectores de prueba. 
-
-Probamos con un vector $v_c$ que tiene $1$ en las posiciones del clique y $0$ en caso contrario.
-
-$x^\top x = k$
-
-$x^\top Ax \approx k(k-1) \approx k^2$
-
-$R(A, v_c) \approx \frac{k^2}{k} = k$
-
-
-
-## Espectro de $E(A)$
-
-Como sus vectores son ortogonales, el otro autovector $u_2$ de autovalor $k$ es ortogonal a $u_1$
-
-$$ 0 = \langle u_1, u_2 \rangle = u_1^\top u_2 =  \sum_i (u_1)_i \cdot (u_2)_i = \sum_i (u_2)_i $$
-
-::: {.callout-note}
-- se sabe que es de los valores propios mas grandes?
-:::
 
 Concluimos que $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 Para que la suma de cero, todos los otros valores deben ser negativos. No necesitan ser gigantes porque hay muchos mas nodos fuera del clique $(n-k)$ que dentro de el, pero empuja los coeficientes del clique hacia los positivos.
 
 ::: {.notes}
+- la señal E(A) se cancela al multiplicar por v_2
+- $k/2$ representa el exceso de conexiones en los nodos del clique
 - v es autovector (amplifica)
 - y a la vez sus coordenadas suman 0
-- maximizan la forma cuadratica x^TAx >> 0
 :::
+
+
+
+
+## Wigner
+
+Los autovalores del ruido estan acotados por $\sqrt(n)$
+
+El autovalor del clique es $k/2$
+
+Alon funciona cuando la señal del clique es mayor a la del ruido.
 
 
 
@@ -464,18 +484,9 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 2. Ordeno las coordenadas de $v_2$ de mayor a menor
 3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
 
-::: {.callout-note}
-Q = {i ∈ V : i tiene al menos 4k/3 vecinos en U}.
-Justificacion?
-:::
-
-
-
-## Wigner
-
-::: {.callout-note}
-Teorema
-: Los otros autovalores de la matriz estan acotados por $\sqrt(n)$
+::: {.notes}
+- Algoritmo en realidad (recuperacion exacta)
+- Q = {i ∈ V : i tiene al menos 4k/3 vecinos en U}.
 :::
 
 
@@ -487,10 +498,10 @@ $\sqrt{n\log n} < k < n/2$ *(Alon)*
 La señal del clique pasa a ser mas importante que el ruido
 El clique se desplaza al autovector principal
 
-|           | $\lambda_1$        | $\lambda_2$        | Clique |
-|-----------|--------------------|--------------------|-------------------|
-| $k < n/2$ | $n/2$ <br> `Ruido` | $k$ <br> `Clique`  | $v_2$  |
-| $k > n/2$ | $k$ <br> `Clique`  | $n/2$ <br> `Ruido` | $v_1$  |
+|           | $\lambda_1$         | $\lambda_2$         | Clique |
+|-----------|---------------------|---------------------|--------|
+| $k < n/2$ | $n/2$ <br> `Ruido`  | $k/2$ <br> `Clique` | $v_2$  |
+| $k > n/2$ | $k/2$ <br> `Clique` | $n/2$ <br> `Ruido`  | $v_1$  |
 
 
 
@@ -501,6 +512,7 @@ El clique se desplaza al autovector principal
 ```{r}
 #| label: espectro-eigenvector
 #| fig.height: 4
+
 n = 800
 k = 3 * ceiling(sqrt(n))
 g = n |> conexiones() |> implantar(k, TRUE) |> grafo()
@@ -522,26 +534,36 @@ graficarRankingVertices(g, v2)
 - Tamaño k=`r k`
 :::
 
-## Teorema
 
-$A = E(A) + \epsilon$
-A es una realizacion de E(A) pero el analisis espectral vale igual
 
-::: {.callout-note}
-- ver documento que mando Manuel con esta justificacion
+## Davis-Kahan
+
+La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del "eigengap"
+
+$$\sin\theta_i \leq \frac{2\|P\|}{min_{j\neq i}|\lambda_i-\lambda_j|}$$
+
+
+$A$ es una realizacion de $E(A)$ pero el analisis espectral vale igual
+
+$A = E(A) + P$
+
+::: {.notes}
+- Si el ruido es pequeño y el salto entre autovalores (el eigengap) es grande, el autovector sigue apuntando a la "verdadera" señal
+- Vinculacion con Wigner (cota autovalores < √n)
+- La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
 :::
 
-> El comportamiento de estos autovalores bajo una matriz aleatoria de Wigner perturbada es predecible mediante la Teoría de Perturbaciones de Matrices y está rigurosamente descrito por transiciones de fase espectral (como las estudiadas por Baik, Ben Arous y Péché, conocidas como transiciones BBP). Cuando la perturbación de rango 1 (el clique) supera el umbral crítico que define la masa del semicírculo de valores singulares, el autovector principal se alinea con la perturbación.
->
-> -- Gemini
 
 
+## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true" data-preload="false"}
 
-## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true"}
+
 
 ## Referencias
 
 Manuel H. (2021). Detección de un k-subgrafo denso en un grafo aleatorio. https://www.fcea.udelar.edu.uy/institucional/agenda/5385-seminario-del-iesta-3.html
+
+Roughgarden, T. (2017). Cs264: Beyond worst-case analysis lectures# 9 and 10: Spectral algorithms for planted bisection and planted clique.
 
 Alon, N., Krivelevich, M., and Sudakov, B. (1998). Finding a large hidden clique in a random graph. Random Structures & Algorithms, 13(3-4):457–466.
 
@@ -550,8 +572,6 @@ Kucera, L. (1995). Expected complexity of graph partitioning problems. Discrete 
 Lei, J., Rinaldo, A., et al. (2015). Consistency of spectral clustering in stochastic block models. Annals of Statistics, 43(1):215–237.
 
 Lugosi, G. (2017). Lectures on combinatorial statistics. 47th Probability Summer School, Saint-Flour, pages 1–91.
-
-Roughgarden, T. (2017). Cs264: Beyond worst-case analysis lectures# 9 and 10: Spectral algorithms for planted bisection and planted clique.
 
 ```{r}
 ## Diagnostico
