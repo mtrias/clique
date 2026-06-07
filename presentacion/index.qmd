@@ -331,20 +331,26 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 
 
 
-## Algo de teoria sobre $\ger[1/2]{n}$
+## $\ger[1/2]{n}$
+<br>
 
 Roughgarden, p16
-: El numero esperado de cliques de tamaño $k$ es $n^k 2^{-k^2/2}$
+: El numero esperado de cliques de tamaño $k$ es $\approx n^k 2^{-k^2/2}$. 
+($=1$ si $k=2\log_2 n$)
+<br/><br/>
 
 Roughgarden, p16
 : El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2\log_2{n}$
+<br/><br/>
 
 Conclusion
 : Si $k$ es chico, un clique de tamaño $k$ sera indistinguible del ruido aleatorio.
 
 ::: {.notes}
-- Ese numero vale exactamente $1$ si $k=2\log_2 n$. Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
+- Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
 :::
+
+
 
 ## Kucera, 1995
 
@@ -370,9 +376,9 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 
 ::: {.notes}
 - "Si se planta un clique de tamaño k, esperamos que los vertices que lo conforman, incrementen su grado en $k-1/2$ (cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
-- Grados fuera del clique ~Bin(n-1, 1/2) ancho distribucion √(n log n) (TLC)
-- Que tan chico puede ser k?
-- k > √ c(n log(n)). 
+- Grados fuera del clique ~Bin(n-1, 1/2)
+- ancho distribucion √(n log n) (TLC)
+- Problema facil para k > √ c(n log(n)). 
 :::
 
 
@@ -449,7 +455,7 @@ Simetrica $\implies$
 & \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
 & E(A) \cdot \ones \approx \frac{n}{2} \ones \\
 \\
-& u_1 \approx \ones \qquad \lambda_1 \approx n/2
+& u_1 \approx \ones \qquad \lambda_1 \approx \frac{n}{2}
 \end{align}
 :::
 
@@ -480,9 +486,9 @@ Entonces, el vector de unos es un $\approx$ autovector.
 
  & \sum_i w_i = 0 \\
 
- & E(A) \cdot w = k w \\
+ & E(A) \cdot w = \frac{k}{2} w \\
  \\
- & v_2 \approx w \qquad \lambda_2 \approx k/2
+ & v_2 \approx w \qquad \lambda_2 \approx \frac{k}{2}
 \end{align}
 
 :::
@@ -515,21 +521,6 @@ Alon funciona cuando la señal del clique es mayor a la del ruido.
 
 
 
-## Algoritmo
-
-Sea $A$ la matriz de adyacencia de $\ger{n}$
-
-1. Calculamos $v_2$
-2. Ordeno las coordenadas de $v_2$ de mayor a menor
-3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
-
-::: {.notes}
-- Algoritmo en realidad (recuperacion exacta)
-- Q = {i ∈ V : i tiene al menos 4k/3 vecinos en U}.
-:::
-
-
-
 ## Que pasa si $k$ es muy grande ?
 
 $\sqrt{n\log n} < k < n/2$ *(Alon)*
@@ -541,6 +532,42 @@ El clique se desplaza al autovector principal
 |-----------|---------------------|---------------------|--------|
 | $k < n/2$ | $n/2$ <br> `Ruido`  | $k/2$ <br> `Clique` | $v_2$  |
 | $k > n/2$ | $k/2$ <br> `Clique` | $n/2$ <br> `Ruido`  | $v_1$  |
+
+
+
+## Davis-Kahan
+
+La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del "eigengap"
+
+$$\sin\theta_i \leq \frac{2\|P\|}{min_{j\neq i}|\lambda_i-\lambda_j|}$$
+
+
+$A$ es una realizacion de $E(A)$ pero el analisis espectral vale igual
+
+$A = E(A) + P$
+
+::: {.notes}
+- Si el ruido es pequeño y el salto entre autovalores (el eigengap) es grande, el autovector sigue apuntando a la "verdadera" señal
+- Vinculacion con Wigner (cota autovalores < √n)
+- La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
+- min λ-λ = k/2, |P|
+- sin θ <= 4√n / k
+:::
+
+
+
+## Algoritmo
+
+Sea $A$ la matriz de adyacencia de $\ger{n}$
+
+1. Calculamos $v_2$
+2. Ordeno las coordenadas de $v_2$ de mayor a menor
+3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
+
+::: {.notes}
+- Algoritmo en realidad (recuperacion exacta)
+- Q = {i ∈ V : i tiene al menos 3k/4 vecinos en U}.
+:::
 
 
 
@@ -573,24 +600,6 @@ graficarRankingVertices(g, v2)
 - Tamaño k=`r k`
 :::
 
-
-
-## Davis-Kahan
-
-La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del "eigengap"
-
-$$\sin\theta_i \leq \frac{2\|P\|}{min_{j\neq i}|\lambda_i-\lambda_j|}$$
-
-
-$A$ es una realizacion de $E(A)$ pero el analisis espectral vale igual
-
-$A = E(A) + P$
-
-::: {.notes}
-- Si el ruido es pequeño y el salto entre autovalores (el eigengap) es grande, el autovector sigue apuntando a la "verdadera" señal
-- Vinculacion con Wigner (cota autovalores < √n)
-- La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
-:::
 
 
 
