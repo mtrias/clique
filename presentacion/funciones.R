@@ -23,6 +23,7 @@ imprimirGrafo <- function(grafo) {
     layout = layout_with_kk(g),
     vertex.color = "#e6f2ff",
     vertex.frame.color = COLOR,
+    vertex.frame.width = 3,
     vertex.label.color = COLOR,
     vertex.label.family = "sans",
     vertex.size = 25,
