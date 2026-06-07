@@ -510,34 +510,39 @@ Para que la suma de cero, todos los otros valores deben ser negativos. No necesi
 
 
 
-
 ## Wigner
 
-Los autovalores del ruido estan acotados por $\sqrt(n)$
+$\lambda_1 \approx n/2$
 
-El autovalor del clique es $k/2$
+Los demas autovalores estan acotados por $\sqrt n$
+
+El autovalor del clique es $k/2$.
 
 Alon funciona cuando la señal del clique es mayor a la del ruido.
 
+$$k>2\sqrt n$$
 
 
-## Que pasa si $k$ es muy grande ?
 
-$\sqrt{n\log n} < k < n/2$ *(Alon)*
+## ¿Que pasa si $k$ es muy grande ?
 
-La señal del clique pasa a ser mas importante que el ruido
-El clique se desplaza al autovector principal
+| $k$                  | $n=10000$    | $\lambda_1$         | $\lambda_2$         | Clique           |
+|----------------------|--------------|---------------------|---------------------|------------------|
+| $< 2\sqrt n$         | $k<200$      |                     |                     | indistinguible   |
+| $< \sqrt{n\log_2 n}$ | $200<k<365$  | $n/2$ <br> `Ruido`  | $k/2$ <br> `Clique` | $v_2$            |
+| $< n/2$              | $364<k<5000$ |                     |                     | trivial (Kucera) |
+| $> n/2$              | $k>5000$     | $k/2$ <br> `Clique` | $n/2$ <br> `Ruido`  | $v_1$            |
 
-|           | $\lambda_1$         | $\lambda_2$         | Clique |
-|-----------|---------------------|---------------------|--------|
-| $k < n/2$ | $n/2$ <br> `Ruido`  | $k/2$ <br> `Clique` | $v_2$  |
-| $k > n/2$ | $k/2$ <br> `Clique` | $n/2$ <br> `Ruido`  | $v_1$  |
+La señal del clique pasa a ser mas importante que el ruido <br/>
+El clique se desplaza al autovector principal $v1$
 
-
+::: {.notes}
+- para k grande, no necesitamos tecnicas espectrales
+:::
 
 ## Davis-Kahan
 
-La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del "eigengap"
+La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del _"eigengap"_
 
 $$\sin\theta_i \leq \frac{2\|P\|}{min_{j\neq i}|\lambda_i-\lambda_j|}$$
 

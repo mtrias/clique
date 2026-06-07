@@ -18,6 +18,10 @@ p.caption {
   font-size: .8em; /* Ajusta este valor para el tamaño del círculo */
 }
 
+.slides code {
+  font-size: .7em;
+}
+
 /* Forzar que los títulos de las slides sean negros */
 .slides h1,
 .slides h2,
