@@ -8,8 +8,6 @@ format:
     slide-number: true
 ---
 
-{{< include macros.tex.qmd >}}
-
 ```{r}
 #| label: setup
 #| include: false
@@ -30,6 +28,8 @@ source("funciones.R")
 ```
 
 ## Motivacion
+
+{{< include macros.tex.qmd >}}
 
 - Interferencia de antenas
 - Correlacion de activos de una cartera
