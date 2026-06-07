@@ -121,9 +121,8 @@ $$ A = \matrizAdySimple $$
 #| fig-align: "center"
 #| fig-width: 6
 #| fig-height: 6
-g <- grafo(CONX_GRAFO_SIMPLE)
+g <- grafo(CONX_CLIQUE_ALEATORIO)
 imprimirGrafo(g)
-
 ```
 :::
 :::
@@ -133,43 +132,6 @@ imprimirGrafo(g)
 - correlacion de activos como objetivo
 - $\theta$ frontera aceptable de correlacion => Matriz de ceros y unos
 :::
-
-
-
-## Grafos de Erdős-Rényi
-
-- $\ger{n}$
-- Tamaño $n$
-- Aristas $\sim Ber(p)$
-- Grado de un nodo $\sim Bin(n-1, p)$
-
-```{r}
-#| label: distribucion-grados-ger-sin-clique
-#| fig.height: 3
-n <- 1800
-conx <- conexiones(n)
-ger <- grafo(conx)
-imprimirDistribucionGrados(ger)
-```
-
-::: {.notes}
-- Nos interesa el caso:
-- p=.5 (maxima entropia)
-- n grande
-- ejemplo: n = `r n` sin clique
-:::
-
-
-
-## Matriz de Adyacencia de un $\ger{n}$
-
-```{r}
-#| label: fig-adyacencia-ger-np
-#| fig-align: "center"
-#| fig-width: 6
-#| fig-height: 6
-400 |> conexiones() |> grafo() |> adyacencia() |> imprimirAdyacencia()
-```
 
 
 
@@ -261,6 +223,44 @@ imprimirAdyacencia(A)
 - No se ve a menos que reordenemos columnas
 - Observar que el clique es informacion de rango 1
 :::
+
+
+
+## Grafos de Erdős-Rényi
+
+- $\ger{n}$
+- Tamaño $n$
+- Aristas $\sim Ber(p)$
+- Grado de un nodo $\sim Bin(n-1, p)$
+
+```{r}
+#| label: distribucion-grados-ger-sin-clique
+#| fig.height: 3
+n <- 1800
+conx <- conexiones(n)
+ger <- grafo(conx)
+imprimirDistribucionGrados(ger)
+```
+
+::: {.notes}
+- Nos interesa el caso:
+- p=.5 (maxima entropia)
+- n grande
+- ejemplo: n = `r n` sin clique
+:::
+
+
+
+## Matriz de Adyacencia de un $\ger{n}$
+
+```{r}
+#| label: fig-adyacencia-ger-np
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 6
+400 |> conexiones() |> grafo() |> adyacencia() |> imprimirAdyacencia()
+```
+
 
 
 ## Clique en el mundo real
