@@ -13,15 +13,35 @@ p.caption {
 }
 
 
-.slide ul li::marker {
-  color: #116699;
+.slides li::marker {
+  color: #36499d;
   font-size: .8em; /* Ajusta este valor para el tamaño del círculo */
 }
 
 /* Forzar que los títulos de las slides sean negros */
-.slide h1,
-.slide h2,
-.slide h3,
-.slide h4 {
-  color: #116699 !important;
+.slides h1,
+.slides h2,
+.slides h3,
+.slides h4 {
+  color: #36499d !important;
+}
+
+.slides h1 {
+  font-size: 1.5em;
+}
+
+.slides h2 {
+  font-size: 1.2em;
+}
+
+.quarto-title-authors {
+  display: none!important;
+}
+
+body {
+  color: #333;
+}
+
+.MathJax {
+  color: #333;
 }

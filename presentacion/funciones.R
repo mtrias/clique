@@ -3,7 +3,7 @@ CONX_CLIQUE_ALEATORIO <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8
 CONX_GRAFO_SIMPLE <- c(1,3, 1,5, 2,4, 3,6, 4,5, 5,6)
 
 
-COLOR = "#116699"
+COLOR = "#36499d" #116699
 
 # Fachada para construir grafos
 grafo <- function(conexiones) {
@@ -23,7 +23,7 @@ imprimirGrafo <- function(grafo) {
     layout = layout_with_kk(g),
     vertex.color = "#e6f2ff",
     vertex.frame.color = COLOR,
-    vertex.label.color = "#333",
+    vertex.label.color = COLOR,
     vertex.label.family = "sans",
     vertex.size = 25,
     edge.color = COLOR,
@@ -95,6 +95,11 @@ imprimirDistribucionGrados <- function(grafo, extraTitle="") {
       color = "white",
       width = 1
     ) +
+    #geom_histogram(
+    #  fill = COLOR,
+    #  color = "white",
+    #  binwidth = 5,
+    #) +
     labs(
       title = sprintf("Distribución del Grado de los Vértices %s", extraTitle),
       x = element_blank(),
@@ -215,7 +220,7 @@ graficarRankingVertices <- function(g, ev) {
   # Si el grafo sigue una topología de ley de potencias (redes libres de escala) o tiene un clique
   # fuertemente conectado, la línea mostrará una caída logarítmica o escalonada pronunciada.
   p <- ggplot(df_ranking, aes(x = Indice, y = Grado)) +
-    geom_line(color = "#116699", linewidth = .5) +
+    geom_line(color = COLOR, linewidth = .5) +
     labs(
       title = sprintf("Correlación Grado del Vertice segun Espectro (n=%d)", length(gradosRanking)),
       subtitle = "Vértices ordenados descendentemente por coordenada asociada en el Vector Propio",

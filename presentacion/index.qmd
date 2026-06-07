@@ -197,7 +197,7 @@ imprimirGrafo(g)
 
 
 
-## Clique aleatorio en A
+## Clique aleatorio
 
 ```{r}
 g <- grafo(CONX_CLIQUE_ALEATORIO)
@@ -229,7 +229,7 @@ imprimirAdyacencia(A)
 - No se ve a menos que reordenemos columnas
 :::
 
-## Clique NO aleatorio en A
+## Clique NO aleatorio
 
 ```{r}
 g <- grafo(CONX_CLIQUE_NO_ALEATORIO)
@@ -263,7 +263,7 @@ imprimirAdyacencia(A)
 :::
 
 
-## Clique en A del mundo real
+## Clique en el mundo real
 
 ```{r}
 n=200
@@ -293,7 +293,7 @@ n |> conexiones() |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirA
 :::
 
 
-## Clique en A del mundo real
+## Clique en el mundo real
 
 ```{r}
 n=200
@@ -301,7 +301,7 @@ k=150
 conx = conexiones(n)
 ```
 
-$\ger[p=.5]{n=`r n`}$ con clique implantado de tamaño $k=`r k`$
+$\ger[p=.5]{`r n`}$ con clique implantado de tamaño $k=`r k`$
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -335,7 +335,7 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 <br>
 
 Roughgarden, p16
-: El numero esperado de cliques de tamaño $k$ es $\approx n^k 2^{-k^2/2}$. 
+: El numero esperado de cliques de tamaño $k$ es $\approx n^k 2^{-k^2/2}$ 
 ($=1$ si $k=2\log_2 n$)
 <br/><br/>
 
