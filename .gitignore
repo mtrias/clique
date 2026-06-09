@@ -51,3 +51,5 @@ rsconnect/
 # Ignoro artifacts de presentacion (se generan en Github Actions)
 presentacion/index.html
 /presentacion/index_files
+presentacion/index-speaker.html
+presentacion/index.rmarkdown

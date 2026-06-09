@@ -6,6 +6,8 @@ format:
     center: false
     css: styles.css
     slide-number: true
+    multiplex:
+      url: "https://multiplex.up.railway.app/"
 ---
 
 ```{r}
