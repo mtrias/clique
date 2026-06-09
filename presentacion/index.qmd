@@ -526,6 +526,21 @@ $$k>2\sqrt n$$
 
 
 
+## Decaimiento Espectral
+
+```{r}
+#| label: espectro-de-adyacencia
+#| fig.width: 22
+#| fig.height: 6
+
+n = 800
+k = ceiling(5*sqrt(n))
+n |> conexiones() |> grafo() |> adyacencia() |> graficarEspectro()
+n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro(sprintf("(k=%s)", k))
+```
+
+
+
 ## ¿Que pasa si $k$ es muy grande ?
 
 | $k$                  | $n=10000$    | $\lambda_1$         | $\lambda_2$         | Clique           |

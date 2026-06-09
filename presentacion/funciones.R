@@ -249,3 +249,43 @@ graficarRankingVertices <- function(g, ev) {
   # 4. Renderizar el gráfico en el dispositivo activo.
   print(p)
 }
+
+# Grafica el decaimiento de los valores propios (Scree Plot) de una matriz de adyacencia
+graficarEspectro <- function(A, extraInfo="") {
+
+  # Calcular los valores propios.
+  valoresPropios <- propios(A)$values
+
+  # Preparar los datos para ggplot2.
+  # eigen() ya devuelve los valores ordenados de mayor a menor por defecto.
+  df_espectro <- data.frame(
+    Indice = 1:length(valoresPropios),
+    ValorPropio = valoresPropios
+  )
+
+  # Recortar el espectro para la visualización.
+  # Para una matriz grande, graficar todos los puntos aprieta demasiado el gráfico.
+  # El gap espectral del clique siempre está en los primeros lugares.
+  # Nos quedamos con los primeros valores propios para mayor claridad en la diapositiva.
+  n_top <- min(50, length(valoresPropios))
+  df_top <- df_espectro[1:n_top, ]
+
+  # Renderizar el gráfico con puntos y líneas para enfatizar el salto.
+  p <- ggplot(df_top, aes(x = Indice, y = ValorPropio)) +
+    geom_line(color = COLOR, linewidth = 1) +
+    geom_point(color = COLOR, size = 2) +
+    labs(
+      title = sprintf("Decaimiento Espectral de la Matriz de Adyacencia (n=%s) %s", nrow(A), extraInfo),
+      subtitle = "Identificación del Gap Espectral generado por el Clique",
+      x = "Índice del Valor Propio (Mayor a Menor)",
+      y = "Magnitud del Valor Propio"
+    ) +
+    scale_x_continuous(n.breaks = 10) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.title = element_text(face = "bold")
+    )
+
+  return(p)
+}
