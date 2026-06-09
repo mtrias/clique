@@ -512,6 +512,8 @@ Para que la suma de cero, todos los otros valores deben ser negativos. No necesi
 
 ## Wigner
 
+<br/>
+
 $\lambda_1 \approx n/2$
 
 Los demas autovalores estan acotados por $\sqrt n$
@@ -588,7 +590,7 @@ n = 800
 k = 3 * ceiling(sqrt(n))
 g = n |> conexiones() |> implantar(k, TRUE) |> grafo()
 A = adyacencia(g)
-eig <- eigen(A, symmetric = TRUE)
+eig <- propios(A)
 v1 <- eig$vectors[, 1]
 v2 <- eig$vectors[, 2]
 

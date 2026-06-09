@@ -34,8 +34,17 @@ imprimirGrafo <- function(grafo) {
   )
 }
 
+# Extraer la matriz de adyacencia del grafo.
 adyacencia <- function(grafo) {
+  # Para grafos no dirigidos, esta matriz es obligatoriamente simétrica.
+  # Usamos sparse = FALSE porque eigen() base de R requiere matrices densas.
   as_adj(grafo, sparse = TRUE)
+}
+
+propios <- function(A) {
+  # symmetric = TRUE le indica a LAPACK que use el algoritmo optimizado para
+  # matrices simétricas reales, garantizando que los valores propios sean reales (no complejos).
+  eigen(A, symmetric = TRUE)
 }
 
 imprimirAdyacencia <- function(a, extraInfo="") {
@@ -73,11 +82,12 @@ imprimirAdyacencia <- function(a, extraInfo="") {
   print(img)
 }
 
+# Calcula el número de aristas incidentes para todos los nodos
 grados <- function(grafo) {
-  #calcula el número de aristas incidentes
   degree(grafo, mode = "all")
 }
 
+# Imprime un grafico de distribucion de los grados de todos los vertices de un grafo
 imprimirDistribucionGrados <- function(grafo, extraTitle="") {
   data.frame(
     Grado = grados(grafo)
