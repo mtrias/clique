@@ -112,7 +112,7 @@ imprimirDistribucionGrados <- function(grafo, extraTitle="") {
     #  binwidth = 5,
     #) +
     labs(
-      title = sprintf("Distribución del Grado de los Vértices %s", extraTitle),
+      title = sprintf("Distribución del Grado de los Vértices (n=%s) %s", vcount(grafo), extraTitle),
       x = element_blank(),
       y = element_blank(),
       #x = "Grado (# conexiones)",

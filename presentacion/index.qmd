@@ -6,6 +6,7 @@ format:
     center: false
     css: styles.css
     slide-number: true
+    preload-iframes: true
     multiplex:
       url: "https://multiplex.up.railway.app/"
 ---
@@ -95,6 +96,7 @@ $$
 
 ::: {.column width="50%"}
 ```{r}
+#| label: adyacencia-simple
 #| fig-align: "center"
 #| fig-width: 6
 #| fig-height: 6
@@ -120,6 +122,7 @@ $$ A = \matrizAdySimple $$
 
 ::: {.column width="50%"}
 ```{r}
+#| label: motivacion-grafo-clique
 #| fig-align: "center"
 #| fig-width: 6
 #| fig-height: 6
@@ -238,17 +241,14 @@ imprimirAdyacencia(A)
 ```{r}
 #| label: distribucion-grados-ger-sin-clique
 #| fig.height: 3
-n <- 1800
-conx <- conexiones(n)
-ger <- grafo(conx)
-imprimirDistribucionGrados(ger)
+
+1800 |> conexiones() |> grafo() |> imprimirDistribucionGrados()
 ```
 
 ::: {.notes}
 - Nos interesa el caso:
 - p=.5 (maxima entropia)
 - n grande
-- ejemplo: n = `r n` sin clique
 :::
 
 
@@ -333,7 +333,7 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 
 
 
-## $\ger[1/2]{n}$
+## $\ger[\half]{n}$
 <br>
 
 Roughgarden, p16
@@ -362,7 +362,7 @@ k1=80
 k2=180
 ```
 
-Distribucion de grados de vertices para $\ger[1/2]{`r n`}$ con clique implantado de tamaños $`r k1`$ y $`r k2`$.
+$\ger[\half]{`r n`}$ con clique implantado.
 
 ```{r}
 #| label: distribucion-grados-ger-clique-k1
@@ -377,7 +377,8 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ```
 
 ::: {.notes}
-- "Si se planta un clique de tamaño k, esperamos que los vertices que lo conforman, incrementen su grado en $k-1/2$ (cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
+- "Si se planta un clique (k), esperamos que los vertices que lo conforman, incrementen su grado en k-1/2
+- cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
 - Grados fuera del clique ~Bin(n-1, 1/2)
 - ancho distribucion √(n log n) (TLC)
 - Problema facil para k > √ c(n log(n)). 
@@ -394,9 +395,9 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 
 $$
 E(A) = \begin{pmatrix}
-1/2 & \dots & 1/2 \\
+\half & \dots & \half \\
 \vdots & \ddots & \vdots \\
-1/2 & \dots & 1/2
+\half & \dots & \half
 \end{pmatrix}
 $$
 
