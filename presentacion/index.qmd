@@ -7,6 +7,7 @@ format:
     css: styles.css
     slide-number: true
     preload-iframes: true
+    default-timing: 3500
     multiplex:
       url: "https://multiplex.up.railway.app/"
 ---
@@ -61,6 +62,7 @@ $E = \{ \{i,j\} \quad i,j \in V \}$
 
 ::: {.column width="50%"}
 ```{r}
+#| label: "grafo-simple"
 #| fig-align: "center"
 #| fig-width: 6
 #| fig-height: 6
@@ -174,6 +176,7 @@ A <- adyacencia(g)
 ::: {.columns}
 ::: {.column width="50%"}
 ```{r}
+#| label: clique-aleatorio-simple
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
@@ -206,6 +209,7 @@ A <- adyacencia(g)
 ::: {.columns}
 ::: {.column width="50%"}
 ```{r}
+#| label: clique-no-aleatorio-simple
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
@@ -277,6 +281,7 @@ $\ger[p=.5]{`r n`}$ con clique implantado de tamaño $k=`r k`$
 ::: {.columns}
 ::: {.column width="50%"}
 ```{r}
+#| label: adyacencia-mundo-real-pos-aleatoria
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
@@ -286,6 +291,7 @@ n |> conexiones() |> implantar(k, TRUE) |> grafo() |> adyacencia() |> imprimirAd
 
 ::: {.column width="50%"}
 ```{r}
+#| label: adyacencia-mundo-real-pos-fija
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
@@ -308,6 +314,7 @@ $\ger[p=.5]{`r n`}$ con clique implantado de tamaño $k=`r k`$
 ::: {.columns}
 ::: {.column width="50%"}
 ```{r}
+#| label: adyacencia-mundo-real-clique-grande-pos-aleatoria
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
@@ -317,6 +324,7 @@ conx |> implantar(k, TRUE) |> grafo() |> adyacencia() |> imprimirAdyacencia("pos
 
 ::: {.column width="50%"}
 ```{r}
+#| label: adyacencia-mundo-real-clique-grande-pos-fija
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
