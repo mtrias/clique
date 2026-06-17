@@ -42,6 +42,10 @@ p.caption {
   text-align: center !important;
 }
 
+.slides .column.centrado-vertical {
+  vertical-align: middle !important;
+}
+
 .quarto-title-authors {
   display: none!important;
 }

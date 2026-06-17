@@ -530,10 +530,10 @@ E(A) = \begin{pmatrix}
 $$
 
 ::: {.notes}
-- Rango 2 => 2 autovalores != 0
+- Rango 2 => 2 autovalores ≠ 0
 - Si no hubiera clique el rango seria 1
 - Clique "agrega perturbacion de grado 1"
-- Grado esperado de los vertices del clique: k - 1
+- Grado esperado de los vertices del clique sube k/2
 :::
 
 
@@ -562,17 +562,19 @@ Simetrica $\implies$
 \begin{align}
 & \ones = (1, \dots, 1)^\top \\ 
 \\
-& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
-& E(A) \cdot \ones \approx \frac{n}{2} \ones \\
+& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) = n/2 \\
+& E(A) \cdot \ones = \frac{n}{2} \ones \\
 \\
-& u_1 \approx \ones \qquad \lambda_1 \approx \frac{n}{2}
+& u_1 = \ones \qquad \lambda_1 = \frac{n}{2}
 \end{align}
 :::
 
 ::: {.column width="40%"}
+::: {.callout-caution appearance="simple"}
 Las sumas de todas las filas son $\approx$ constantes.
 
 Entonces, el vector de unos es un $\approx$ autovector.
+:::
 :::
 :::
 
@@ -587,37 +589,39 @@ Entonces, el vector de unos es un $\approx$ autovector.
 ## $v_2$ Segundo autovector de $E(A)$
 
 ::: {.columns}
-::: {.column width="65%"}
+::: {.column .centrado-vertical width="70%"}
 
 \begin{align}
- & v_1 \perp v_2 \\
- \\
- & 0 = \langle v_1, v_2 \rangle = v_1^\top v_2 =  \sum_i (v_1)_i \cdot (v_2)_i = \sum_i (v_2)_i \\
-
- & w = (n-k, \dots, n-k, \quad -k, \dots, -k) \\
-
- & \sum_i w_i = 0 \\
-
- & E(A) \cdot w = \frac{k}{2} w \\
- \\
- & v_2 \approx w \qquad \lambda_2 \approx \frac{k}{2}
+& v_1 \perp v_2 \\
+& 0 = \langle v_1, v_2 \rangle = v_1^\top v_2 =  \sum_i (v_1)_i \cdot (v_2)_i = \sum_i (v_2)_i \\
+\\
+&w = (n-k, \dots, n-k, \quad -k, \dots, -k) \\
+&\sum_i w_i = 0 \\
+&E(A)\cdot w = \left( \half(n-k)k,\dots,\half(n-k)k,0,\dots,0 \right) \\
+&E(A) \cdot w \approx \frac{k}{2} w \\
+\\
+& v_2 \approx w \qquad \lambda_2 \approx \frac{k}{2}
 \end{align}
 
 :::
+::: {.column .centrado-vertical width="30%"}
 
-::: {.column width="35%"}
-Para que la suma de cero, todos los otros valores deben ser negativos. No necesitan ser gigantes porque hay muchos mas nodos fuera del clique $(n-k)$ que dentro de el, pero empuja los coeficientes del clique hacia los positivos.
-
-**$v_2$ asigna valores grandes a los $k$ vertices del clique.**
+::: {.callout-caution appearance="simple"}
+$v_2$ asigna valores grandes a los $k$ vertices del clique.
+:::
 
 :::
 :::
 
 ::: {.notes}
+- w es autovector (no nulo)
+- pero a la vez sus coordenadas suman 0
+- Elijo solucion trivial: valor positivo para las coordenadas del clique, negativo en el resto
+- Para que la suma de cero, todos los otros valores deben ser negativos.
+- No necesitan ser gigantes porque hay muchos mas nodos fuera del clique $(n-k)$ que dentro de el, pero empuja los coeficientes del clique hacia los positivos.
+
 - la señal E(A) se cancela al multiplicar por v_2
 - $k/2$ representa el exceso de conexiones en los nodos del clique
-- v es autovector (amplifica)
-- y a la vez sus coordenadas suman 0
 :::
 
 
