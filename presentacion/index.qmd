@@ -226,7 +226,7 @@ A <- adyacencia(g)
 ::: {.columns}
 ::: {.column width="50%"}
 ```{r}
-#| label: clique-no-aleatorio-simple
+#| label: grafo-chico-clique-posicion-trivial
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
@@ -267,14 +267,14 @@ imprimirAdyacencia(A)
 
 - $\ger{n}$
 - Tamaño $n$
-- Aristas $\sim Ber(p)$
+- Aristas $\sim Ber(p)$ independientes
 - Grado de un nodo $\sim Bin(n-1, p)$
 
 ```{r}
 #| label: distribucion-grados-ger-sin-clique
 #| fig.height: 3
 
-1800 |> conexiones() |> grafo() |> imprimirDistribucionGrados()
+2000 |> conexiones() |> grafo() |> imprimirDistribucionGrados()
 ```
 
 ::: {.notes}
