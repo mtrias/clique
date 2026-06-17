@@ -373,6 +373,7 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 - Como se ve el clique?
 - Depende de p, k y n
 - k muy grande, altera la "estructura base", la señal ahora no tiene ruido aleatorio, sino que es puro clique.
+- Estamos interesados en ciertos k y n que hacen factible encontrar una solucion
 :::
 
 
@@ -388,14 +389,15 @@ Roughgarden, p16
 <br/><br/>
 
 Roughgarden, p16
-: El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2\log_2{n}$
+: El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2*log_2{n}$
 <br/><br/>
 
 Conclusion
 : Si $k$ es chico, un clique de tamaño $k$ sera indistinguible del ruido aleatorio.
 
 ::: {.notes}
-- Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
+- Es decir, $2*log_2 n$ es el $k$ mas grande para el que ya esperamos ver al menos un clique de tamaño $k$.
+- Ejemplo: n=1000, => k~20 
 :::
 
 
@@ -405,7 +407,7 @@ Conclusion
 ## Kucera, 1995
 
 ```{r}
-n=800
+n=1000
 k1=80
 k2=180
 ```
@@ -425,11 +427,60 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ```
 
 ::: {.notes}
-- "Si se planta un clique (k), esperamos que los vertices que lo conforman, incrementen su grado en k-1/2
-- cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes).
+- "Si se planta un clique (k), esperamos que los vertices que lo conforman, incrementen su grado en k-1/2"
+- cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes.
 - Grados fuera del clique ~Bin(n-1, 1/2)
 - ancho distribucion √(n log n) (TLC)
 - Problema facil para k > √ c(n log(n)). 
+- Simplemente tomo los nodos de mayor grado del grafo
+:::
+
+
+
+
+
+## Ganó Alon
+
+::: {.columns}
+::: {.column width="75%"}
+![](cotas.png)
+:::
+
+```{r}
+n <- 1000
+```
+
+::: {.column width="25%"}
+```{r}
+#| label: cotas
+#| include: true
+#| echo: true
+n
+
+# Roughgarden
+2 * log2(n)
+
+# Kucera
+sqrt(n * log10(n))
+
+# Alon
+sqrt(n)
+```
+:::
+:::
+
+```{r}
+## {background-iframe="https://www.geogebra.org/graphing/ew6nbcfg?embed" background-interactive="true" data-preload="false"}
+
+# https://www.geogebra.org/graphing/ew6nbcfg
+
+#<iframe src="https://www.geogebra.org/graphing/ew6nbcfg?embed" width="800" height="600" allowfullscreen style="border: 1px solid #e4e4e4;border-radius: 4px;" frameborder="0"></iframe>
+```
+
+::: {.notes}
+- Roughgarden: probabilidad 1 de encontrar clique
+- Kucera: trivial por arriba
+- Alon: mejor cota inferior
 :::
 
 
@@ -451,12 +502,12 @@ E(A) = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-A = Señal + Perturbacion
-: $$A = E(A) + P$$
+Señal + Perturbacion: $A = E(A) + P$
 
 ::: {.notes}
 - La diagonal deberian ser 0 pero eso no cambia el resultado
 - Grado esperado de cualquier vertice es n-1 / 2
+- n=1000 => √n ~31
 :::
 
 
