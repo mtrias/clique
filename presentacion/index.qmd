@@ -6,7 +6,7 @@ format:
     center: false
     css: styles.css
     slide-number: true
-    preload-iframes: true
+    preload-iframes: false
     default-timing: 3500
     multiplex:
       url: "https://multiplex.up.railway.app/"
