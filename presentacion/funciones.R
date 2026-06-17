@@ -84,6 +84,14 @@ imprimirAdyacencia <- function(a, extraInfo="") {
     })
   }
 
+  # Mostrar todos los ticks para matrices "muy chicas"
+  if (nFilas <= 10) {
+    img <- update(img, scales = list(
+      x = list(at = 1:nFilas),
+      y = list(at = 1:nFilas)
+    ))
+  }
+
   print(img)
 }
 
