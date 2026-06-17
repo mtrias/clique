@@ -184,7 +184,6 @@ imprimirGrafo(g)
 
 ```{r}
 g <- grafo(CONX_CLIQUE_ALEATORIO)
-A <- adyacencia(g)
 ```
 
 ::: {.columns}
@@ -204,7 +203,7 @@ imprimirGrafo(g)
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirAdyacencia(A)
+g |> adyacencia() |> imprimirAdyacencia()
 ```
 :::
 :::
