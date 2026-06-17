@@ -43,7 +43,7 @@ imprimirGrafo <- function(grafo, labels=NULL) {
 adyacencia <- function(grafo) {
   # Para grafos no dirigidos, esta matriz es obligatoriamente simétrica.
   # Usamos sparse = FALSE porque eigen() base de R requiere matrices densas.
-  as_adj(grafo, sparse = TRUE)
+  as_adjacency_matrix(grafo, sparse = TRUE)
 }
 
 propios <- function(A) {
