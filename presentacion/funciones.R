@@ -290,10 +290,11 @@ graficarEspectro <- function(A, extraInfo="") {
     labs(
       title = sprintf("Decaimiento Espectral de la Matriz de Adyacencia (n=%s) %s", nrow(A), extraInfo),
       subtitle = "Identificación del Gap Espectral generado por el Clique",
-      x = "Índice del Valor Propio (Mayor a Menor)",
-      y = "Magnitud del Valor Propio"
+      x = "Indice del Valor Propio (Mayor a Menor)",
+      y = "Log10( Magnitud del Valor Propio )"
     ) +
     scale_x_continuous(n.breaks = 10) +
+    scale_y_log10() + # Si no uso escala logaritmica los valores propios (ademas del primero) se pegan a cero
     theme_minimal() +
     theme(
       panel.grid.minor = element_blank(),

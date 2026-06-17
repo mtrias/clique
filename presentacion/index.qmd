@@ -635,13 +635,15 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 #| fig.width: 22
 #| fig.height: 6
 
-n = 800
-k = ceiling(5*sqrt(n))
+n = 1000
+k = 150
 n |> conexiones() |> grafo() |> adyacencia() |> graficarEspectro()
 n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro(sprintf("(k=%s)", k))
 ```
 
-
+::: {.notes}
+- hay mas valores propios (significativos)? -> No
+:::
 
 
 
