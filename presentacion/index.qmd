@@ -628,24 +628,6 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 
 
-## Wigner
-
-<br/>
-
-$\lambda_1 \approx n/2$
-
-Los demas autovalores estan acotados por $\sqrt n$
-
-El autovalor del clique es $k/2$.
-
-Alon funciona cuando la señal del clique es mayor a la del ruido.
-
-$$k>2\sqrt n$$
-
-
-
-
-
 ## Decaimiento Espectral
 
 ```{r}
