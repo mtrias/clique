@@ -648,20 +648,36 @@ n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro
 
 
 ## ¿Que pasa si $k$ es muy grande ?
+```{r}
+n  = 1000
+rg = ceiling( 2 * log2(n) )        # Roughgarden, limite indistinguible
+al = ceiling( sqrt(n) )            # Alon, Limite de efectividad de algoritmo espectral
+kc = ceiling( sqrt(n * log10(n)) ) # Kucera, limite de trivialidad
+```
 
-| $k$                  | $n=10000$    | $\lambda_1$         | $\lambda_2$         | Clique           |
-|----------------------|--------------|---------------------|---------------------|------------------|
-| $< 2\sqrt n$         | $k<200$      |                     |                     | indistinguible   |
-| $< \sqrt{n\log_2 n}$ | $200<k<365$  | $n/2$ <br> `Ruido`  | $k/2$ <br> `Clique` | $v_2$            |
-| $< n/2$              | $364<k<5000$ |                     |                     | trivial (Kucera) |
-| $> n/2$              | $k>5000$     | $k/2$ <br> `Clique` | $n/2$ <br> `Ruido`  | $v_1$            |
-
-La señal del clique pasa a ser mas importante que el ruido <br/>
-El clique se desplaza al autovector principal $v1$
+| $n=1000$           | $\lambda_1 = n/2$   | $\lambda_2 = k/2$   | Clique                |
+|--------------------|---------------------|---------------------|-----------------------|
+| $k<`r rg`$         |                     |                     | Indistinguible        |
+| $k<`r al`$         |                     |                     | No funciona Alon      |
+| $`r al`<k<`r kc`$  | `Ruido`             | `Clique` en $v_2$   | Alg. Espectral <small>(Alon)</small> |
+| $k<`r n/2`$        |                     |                     | Trivial <small>(Kucera)</small>      |
+| $k>`r n/2`$        | `Clique` en $v1$    | `Ruido`             |                       |
 
 ::: {.notes}
 - para k grande, no necesitamos tecnicas espectrales
+- para k>n/2 el clique se desplaza al autovector principal $v1$
 :::
+
+```{r}
+# Saco la primer columna porque no entra, y quizas no es necesaria
+#| $k$                  
+#|----------------------
+#| $< 2\log_2 n$        
+#| $< \sqrt n$          
+#| $< \sqrt{n*log(n)}$  
+#| $< n/2$              
+#| $> n/2$              
+```
 
 
 
