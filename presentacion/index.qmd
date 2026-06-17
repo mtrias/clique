@@ -31,6 +31,10 @@ library(ggplot2)
 source("funciones.R")
 ```
 
+
+
+
+
 ## Motivacion
 
 {{< include macros.tex.qmd >}}
@@ -46,6 +50,8 @@ $\vdots$
 ::: {.notes}
 - Breve explicacion de cada uno de los problemas.
 :::
+
+
 
 
 
@@ -78,6 +84,8 @@ imprimirGrafo(g)
 - Sin loops (i != j)
 - Concepto: orden de un nodo
 :::
+
+
 
 
 
@@ -115,6 +123,8 @@ imprimirGrafo(g)
 
 
 
+
+
 ## Motivacion (bis)
 
 ::: {.columns}
@@ -139,6 +149,8 @@ imprimirGrafo(g)
 - correlacion de activos como objetivo
 - $\theta$ frontera aceptable de correlacion => Matriz de ceros y unos
 :::
+
+
 
 
 
@@ -167,6 +179,8 @@ imprimirGrafo(g)
 
 
 ## Clique aleatorio
+
+
 
 ```{r}
 g <- grafo(CONX_CLIQUE_ALEATORIO)
@@ -198,6 +212,10 @@ imprimirAdyacencia(A)
 ::: {.notes}
 - No se ve a menos que reordenemos columnas
 :::
+
+
+
+
 
 ## Clique NO aleatorio
 
@@ -235,6 +253,8 @@ imprimirAdyacencia(A)
 
 
 
+
+
 ## Grafos de Erdős-Rényi
 
 - $\ger{n}$
@@ -257,6 +277,8 @@ imprimirAdyacencia(A)
 
 
 
+
+
 ## Matriz de Adyacencia de un $\ger{n}$
 
 ```{r}
@@ -266,6 +288,8 @@ imprimirAdyacencia(A)
 #| fig-height: 6
 400 |> conexiones() |> grafo() |> adyacencia() |> imprimirAdyacencia()
 ```
+
+
 
 
 
@@ -299,6 +323,9 @@ n |> conexiones() |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirA
 ```
 :::
 :::
+
+
+
 
 
 ## Clique en el mundo real
@@ -341,6 +368,8 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 
 
 
+
+
 ## $\ger[\half]{n}$
 <br>
 
@@ -359,6 +388,8 @@ Conclusion
 ::: {.notes}
 - Es decir, $2\log_2 n$ es el $k$ mas grande para el que esperamos ver al menos un clique de tamaño $k$.
 :::
+
+
 
 
 
@@ -394,6 +425,8 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 
 
 
+
+
 ## Alon, 1998
 
 Algoritmo de clustering espectral. Asegura una deteccion exacta en tiempo polinomial si $k = \Omega(\sqrt n)$
@@ -416,6 +449,8 @@ A = Señal + Perturbacion
 - La diagonal deberian ser 0 pero eso no cambia el resultado
 - Grado esperado de cualquier vertice es n-1 / 2
 :::
+
+
 
 
 
@@ -443,6 +478,8 @@ $$
 
 
 
+
+
 ## Espectro de $E(A)$
 
 <br>
@@ -451,6 +488,8 @@ Simetrica $\implies$
 
 - $\lambda_i \in \mathbb{R}$
 - Autovectores Ortogonales
+
+
 
 
 
@@ -480,6 +519,8 @@ Entonces, el vector de unos es un $\approx$ autovector.
 ::: {.notes}
 - λ1 representa el promedio de conexiones en el grafo
 :::
+
+
 
 
 
@@ -521,6 +562,8 @@ Para que la suma de cero, todos los otros valores deben ser negativos. No necesi
 
 
 
+
+
 ## Wigner
 
 <br/>
@@ -534,6 +577,8 @@ El autovalor del clique es $k/2$.
 Alon funciona cuando la señal del clique es mayor a la del ruido.
 
 $$k>2\sqrt n$$
+
+
 
 
 
@@ -552,6 +597,8 @@ n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro
 
 
 
+
+
 ## ¿Que pasa si $k$ es muy grande ?
 
 | $k$                  | $n=10000$    | $\lambda_1$         | $\lambda_2$         | Clique           |
@@ -567,6 +614,10 @@ El clique se desplaza al autovector principal $v1$
 ::: {.notes}
 - para k grande, no necesitamos tecnicas espectrales
 :::
+
+
+
+
 
 ## Davis-Kahan
 
@@ -589,6 +640,8 @@ $A = E(A) + P$
 
 
 
+
+
 ## Algoritmo
 
 Sea $A$ la matriz de adyacencia de $\ger{n}$
@@ -601,6 +654,8 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 - Algoritmo en realidad (recuperacion exacta)
 - Q = {i ∈ V : i tiene al menos 3k/4 vecinos en U}.
 :::
+
+
 
 
 
@@ -637,6 +692,8 @@ graficarRankingVertices(g, v2)
 
 
 ## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true" data-preload="false"}
+
+
 
 
 
