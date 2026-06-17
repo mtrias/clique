@@ -178,9 +178,9 @@ imprimirGrafo(g)
 
 
 
-## Clique aleatorio
 
 
+## Clique y Matriz de Adyacencia
 
 ```{r}
 g <- grafo(CONX_CLIQUE_ALEATORIO)
