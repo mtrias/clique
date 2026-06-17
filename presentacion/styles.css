@@ -38,6 +38,10 @@ p.caption {
   font-size: 1.2em;
 }
 
+.slides .centrado {
+  text-align: center !important;
+}
+
 .quarto-title-authors {
   display: none!important;
 }
