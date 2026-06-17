@@ -743,9 +743,9 @@ graficarRankingVertices(g, v2)
 ```
 
 ::: {.notes}
-- Las coordenadas del clique estan por encima de las otras
+- Tamaño n=`r n` k=`r k`
+- Las coordenadas del clique estan por encima de las otras aprox k/2
 - Las otras coordenadas estan en torno a n/2
-- Tamaño k=`r k`
 :::
 
 

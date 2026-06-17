@@ -5,13 +5,13 @@ CONX_GRAFO_SIMPLE        <- c(1,3, 1,5, 2,4, 3,6, 4,5, 5,6)
 
 COLOR = "#36499d" #116699
 
-# Fachada para construir grafos
+# Fachada para construir grafos de igraph
 grafo <- function(conexiones) {
 
   g <- make_graph(conexiones, directed = FALSE)
 
-  # Devolvemos el objeto 'g' de forma invisible
-  # para que puedas extraer la matriz de adyacencia después
+  # Devolvemos el objeto g de forma invisible
+  # para extraer la matriz de adyacencia después
   invisible(g)
 }
 
