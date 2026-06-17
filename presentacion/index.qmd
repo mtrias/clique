@@ -733,15 +733,11 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 
 n = 800
 k = 3 * ceiling(sqrt(n))
-g = n |> conexiones() |> implantar(k, TRUE) |> grafo()
+g = n |> conexiones() |> implantar(k) |> grafo()
 A = adyacencia(g)
 eig <- propios(A)
 v1 <- eig$vectors[, 1]
 v2 <- eig$vectors[, 2]
-
-# Vertices del clique
-#node_indices <- order(v2, decreasing = TRUE)[1:k]
-#U_nodes <- igraph::V(g_calc)$name[node_indices]
 
 graficarRankingVertices(g, v2)
 ```
