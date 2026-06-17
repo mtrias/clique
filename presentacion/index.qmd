@@ -216,7 +216,7 @@ g |> adyacencia() |> imprimirAdyacencia()
 
 
 
-## Clique NO aleatorio
+## Clique en una posicion trivial
 
 ```{r}
 g <- grafo(CONX_CLIQUE_NO_ALEATORIO)
@@ -230,7 +230,15 @@ A <- adyacencia(g)
 #| fig-align: "center"
 #| fig-width: 5
 #| fig-height: 5
-imprimirGrafo(g)
+
+# Hay un poco de trampa aqui.
+# Imprimo el grafo con clique en ubicacion aleatoria en lugar del NO aleatorio
+# Esto lo hago porque, a pesar de que ambos grafos son topologicamente identicos, cambiar el nombre de los vertices afecta el layout fisico de igraph.
+# En esta slide quiero imprimir exactamente el mismo grafo, pero con labels distintos para mostrar como ese reordenamiento trivial hace el clique visible en la matriz de adyacencia
+# La trampa entonces, es imprimir el mismo grafo pero con labels distintos, lo cual lo hace coincidir con la matriz de adyacencia que se imprime en la otra columna
+# Observar que en el grafo de clique en posicion "trivial" solamente se cambia el nodo 4 por el 6
+g <- grafo(CONX_CLIQUE_ALEATORIO)
+imprimirGrafo(g, labels=c("1","2","3","6","5","4","7","8"))
 ```
 :::
 
@@ -247,6 +255,7 @@ imprimirAdyacencia(A)
 
 ::: {.notes}
 - No se ve a menos que reordenemos columnas
+- Solamente se cambia el nodo 4 por el 6
 - Observar que el clique es informacion de rango 1
 :::
 

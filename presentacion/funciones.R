@@ -1,6 +1,6 @@
-CONX_CLIQUE_NO_ALEATORIO <- c(1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 5,6, 4,6, 5,7, 6,7, 6,8)
-CONX_CLIQUE_ALEATORIO <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8)
-CONX_GRAFO_SIMPLE <- c(1,3, 1,5, 2,4, 3,6, 4,5, 5,6)
+CONX_CLIQUE_NO_ALEATORIO <- c(2,5, 2,4, 2,3, 5,4, 3,5, 3,4, 3,7, 6,7, 1,7, 1,6, 1,8)
+CONX_CLIQUE_ALEATORIO    <- c(2,5, 2,6, 2,3, 5,6, 3,5, 3,6, 3,7, 4,7, 1,7, 1,4, 1,8)
+CONX_GRAFO_SIMPLE        <- c(1,3, 1,5, 2,4, 3,6, 4,5, 5,6)
 
 
 COLOR = "#36499d" #116699
@@ -15,7 +15,11 @@ grafo <- function(conexiones) {
   invisible(g)
 }
 
-imprimirGrafo <- function(grafo) {
+# Imprime una imagen que representa el grafo de igraph pasado por parametro
+# Opcionalmente se pueden alterar las etiquetas de texto (labels) que se imprimen en los vertices
+# Esto es util si se quiere generar dos graficos identicos, pero con distintos labels y que se impriman exactamente igual
+# En este caso, el resultado que produce igraph es diferente al cambiar los labels porque esta basado en el layout fisico iniciado con una posicion pseudoaleatoria
+imprimirGrafo <- function(grafo, labels=NULL) {
   # Eliminar los márgenes base de R (Abajo, Izquierda, Arriba, Derecha)
   par(mar = c(0, 0, 0, 0))
   plot(
@@ -26,6 +30,7 @@ imprimirGrafo <- function(grafo) {
     vertex.frame.width = 3,
     vertex.label.color = COLOR,
     vertex.label.family = "sans",
+    vertex.label = labels,
     vertex.size = 25,
     edge.color = COLOR,
     edge.width = 2,
