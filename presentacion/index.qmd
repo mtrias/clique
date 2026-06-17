@@ -125,35 +125,6 @@ imprimirGrafo(g)
 
 
 
-## Motivacion (bis)
-
-::: {.columns}
-::: {.column width="50%"}
-$$ A = \matrizAdySimple $$
-:::
-
-::: {.column width="50%"}
-```{r}
-#| label: motivacion-grafo-clique
-#| fig-align: "center"
-#| fig-width: 6
-#| fig-height: 6
-g <- grafo(CONX_CLIQUE_ALEATORIO)
-imprimirGrafo(g)
-```
-:::
-:::
-
-::: {.notes}
-- cada nodo es un activo financiero
-- correlacion de activos como objetivo
-- $\theta$ frontera aceptable de correlacion => Matriz de ceros y unos
-:::
-
-
-
-
-
 ## ¿Que es un Clique ?
 
 Un Subgrafo Completo Maximal
@@ -257,6 +228,36 @@ imprimirAdyacencia(A)
 - No se ve a menos que reordenemos columnas
 - Solamente se cambia el nodo 4 por el 6
 - Observar que el clique es informacion de rango 1
+:::
+
+
+
+
+
+## Motivacion (bis)
+
+::: {.columns}
+::: {.column width="50%"}
+$$ A = \matrizAdySimple $$
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: motivacion-grafo-clique
+#| fig-align: "center"
+#| fig-width: 6
+#| fig-height: 6
+g <- grafo(CONX_CLIQUE_ALEATORIO)
+imprimirGrafo(g)
+```
+:::
+:::
+
+::: {.notes}
+- cada nodo es un activo financiero
+- correlacion de activos como objetivo
+- $\theta$ frontera aceptable de correlacion => Matriz de ceros y unos
+- Problema NP. solución basada en el álgebra lineal espectral. En lugar de analizar la red nodo por nodo, analizamos el expectro
 :::
 
 
