@@ -244,7 +244,7 @@ graficarRankingVertices <- function(g, ev) {
   # Si el grafo sigue una topología de ley de potencias (redes libres de escala) o tiene un clique
   # fuertemente conectado, la línea mostrará una caída logarítmica o escalonada pronunciada.
   p <- ggplot(df_ranking, aes(x = Indice, y = Grado)) +
-    geom_line(color = COLOR, linewidth = .5) +
+    geom_point(color = COLOR, linewidth = .5) +
     labs(
       title = sprintf("Correlación Grado del Vertice segun Espectro (n=%d)", length(gradosRanking)),
       subtitle = "Vértices ordenados descendentemente por coordenada asociada en el Vector Propio",
