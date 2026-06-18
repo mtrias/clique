@@ -647,7 +647,7 @@ n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro
 
 
 
-## ¿Que pasa si $k$ es muy grande ?
+## ¿Que pasa de acuerdo a $k$ ?
 ```{r}
 n  = 1000
 rg = ceiling( 2 * log2(n) )        # Roughgarden, limite indistinguible
@@ -786,7 +786,7 @@ graficarSumaConexiones <- function(data, info) {
     )
 }
 
-graficarSumaConexiones(colSums(A), "TODA A")
+#graficarSumaConexiones(colSums(A), "TODA A")
 graficarSumaConexiones(colSums(filasEnClique), "filas DENTRO del clique")
 graficarSumaConexiones(colSums(filasNoEnClique), "filas FUERA del clique")
 ```
