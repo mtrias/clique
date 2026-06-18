@@ -757,7 +757,7 @@ graficarRankingVertices(g, v2)
 ```{r}
 #| label: suma-por-columnas-de-A-segun-clique
 #| fig.width: 22
-#| fig.height: 4
+#| fig.height: 5.5
 
 n = 1000
 k = 4 * ceiling(sqrt(n))
@@ -774,21 +774,9 @@ node_indices <- order(abs(v2), decreasing = TRUE)[1:k]
 filasEnClique <- A[node_indices, ]
 filasNoEnClique <- A[-node_indices, ]
 
-graficarSumaConexiones <- function(data, info) {
-  df <- data.frame(Nodo = 1:n, Suma = data)
-  ggplot(df, aes(x = Nodo, y = Suma)) + 
-    geom_point() +
-    theme_minimal() +
-    labs(
-      x = element_blank(),
-      y = element_blank(),
-      title = sprintf("Suma de conexiones en %s", info)
-    )
-}
-
 #graficarSumaConexiones(colSums(A), "TODA A")
-graficarSumaConexiones(colSums(filasEnClique), "filas DENTRO del clique")
-graficarSumaConexiones(colSums(filasNoEnClique), "filas FUERA del clique")
+graficarSumaConexiones(colSums(filasEnClique), "DENTRO del clique")
+graficarSumaConexiones(colSums(filasNoEnClique), "FUERA del clique")
 ```
 
 

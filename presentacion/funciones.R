@@ -109,21 +109,11 @@ imprimirDistribucionGrados <- function(grafo, extraTitle="") {
     # Se ve mas linda, pero no es la que usa Kucera?
     # agregar al aes: , x=nodo
     # agregar al DF: nodo = 1:vcount(grafo)
-    #geom_point(
-    #  fill = COLOR,
-    #  color = COLOR,
-    #  width = 1
-    #) +
     geom_bar(
       fill = COLOR,
       color = "white",
       width = 1
     ) +
-    #geom_histogram(
-    #  fill = COLOR,
-    #  color = "white",
-    #  binwidth = 5,
-    #) +
     labs(
       title = sprintf("Distribución del Grado de los Vértices (n=%s) %s", vcount(grafo), extraTitle),
       x = element_blank(),
@@ -134,6 +124,22 @@ imprimirDistribucionGrados <- function(grafo, extraTitle="") {
     theme_minimal() +
     theme(
       panel.grid.minor = element_blank()
+    )
+}
+
+graficarSumaConexiones <- function(data, info) {
+  df <- data.frame(Nodo = 1:n, Suma = data)
+  ggplot(df, aes(x = Nodo, y = Suma)) +
+    geom_point(
+      fill = COLOR,
+      color = COLOR,
+      size = 3,
+    ) +
+    theme_minimal() +
+    labs(
+      x = element_blank(),
+      y = element_blank(),
+      title = sprintf("Suma de conexiones en filas %s", info)
     )
 }
 
@@ -244,7 +250,10 @@ graficarRankingVertices <- function(g, ev) {
   # Si el grafo sigue una topología de ley de potencias (redes libres de escala) o tiene un clique
   # fuertemente conectado, la línea mostrará una caída logarítmica o escalonada pronunciada.
   p <- ggplot(df_ranking, aes(x = Indice, y = Grado)) +
-    geom_point(color = COLOR, linewidth = .5) +
+    geom_point(
+      color = COLOR,
+      linewidth = .5
+    ) +
     labs(
       title = sprintf("Correlación Grado del Vertice segun Espectro (n=%d)", length(gradosRanking)),
       subtitle = "Vértices ordenados descendentemente por coordenada asociada en el Vector Propio",
