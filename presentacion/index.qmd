@@ -701,10 +701,13 @@ $A = E(A) + P$
 
 ::: {.notes}
 - Si el ruido es pequeño y el salto entre autovalores (el eigengap) es grande, el autovector sigue apuntando a la "verdadera" señal
-- Vinculacion con Wigner (cota autovalores < √n)
-- La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
-- min λ-λ = k/2, |P|
+- Vinculacion con Wigner (cota autovalores luego del principal < √n)
 - sin θ <= 4√n / k
+- Por que vale este analisis de E(A) en A?
+1. Teoria de Perturbaciones
+2. sin θ acotado => La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
+3. Se pueden calcular los autovectores reales y comprobar que son parecidos
+4. Se puede aplicar el algoritmo y comprobar que funciona.
 :::
 
 
