@@ -636,8 +636,8 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 ```{r}
 #| label: espectro-de-adyacencia
-#| fig.width: 22
-#| fig.height: 6
+#| fig.width: 11
+#| fig.height: 3
 
 n = 1000
 k = 150

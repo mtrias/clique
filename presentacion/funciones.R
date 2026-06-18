@@ -324,7 +324,7 @@ graficarEspectro <- function(A, extraInfo="") {
   # eigen() ya devuelve los valores ordenados de mayor a menor por defecto.
   df_espectro <- data.frame(
     Indice = 1:length(valoresPropios),
-    ValorPropio = valoresPropios
+    ValorPropio = sort(valoresPropios, decreasing = TRUE)
   )
 
   # Recortar el espectro para la visualización.
