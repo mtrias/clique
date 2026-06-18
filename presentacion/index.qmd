@@ -237,9 +237,6 @@ imprimirAdyacencia(A)
 ## Motivacion (bis)
 
 ::: {.columns}
-::: {.column width="50%"}
-$$ A = \matrizAdySimple $$
-:::
 
 ::: {.column width="50%"}
 ```{r}
@@ -251,6 +248,10 @@ g <- grafo(CONX_CLIQUE_ALEATORIO)
 imprimirGrafo(g)
 ```
 :::
+::: {.column width="50%"}
+$$ A = \matrizAdySimple $$
+:::
+
 :::
 
 ::: {.notes}
