@@ -444,18 +444,17 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 
 ::: {.columns}
 ::: {.column width="75%"}
+
 ![](cotas.png)
-```{r}
-# Fuente: https://www.geogebra.org/graphing/ew6nbcfg
-```
+
+<small>Fuente: [Geogebra](https://www.geogebra.org/graphing/ew6nbcfg)</small>
 
 :::
-
+::: {.column width="25%"}
 ```{r}
 n <- 1000
 ```
 
-::: {.column width="25%"}
 ```{r}
 #| label: cotas
 #| include: true
