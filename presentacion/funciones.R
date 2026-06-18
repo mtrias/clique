@@ -220,8 +220,10 @@ rankingVertices <- function(g, ev) {
   # originales de los elementos, ordenadas según su valor numérico.
   # Se utiliza decreasing = TRUE para que el vértice más "central" (mayor valor) quede en la posición 1.
   ############
-  # DUDA: si ordeno lo por ev, los nodos del clique se ven al final del grafo porque el vector propio -ev es el mismo pero cambiado de sentido. Sin embargo, segun gemini deberia ordenar por abs(ev), pero creo que se equivoca
-  indicesOrdenados <- order(ev*(-1), decreasing = TRUE)
+  # DUDA: si ordeno lo por ev, los nodos del clique se ven al final del grafo porque el vector propio -ev es el mismo pero cambiado de sentido.
+  # Sin embargo, segun gemini deberia ordenar por abs(ev), pero creo que se equivoca
+  # EDIT: No se equivoca. El vector propio que devuelve eigen() puede estar dado vuelta (-v2 tambien es vector propio)
+  indicesOrdenados <- order(abs(ev), decreasing = TRUE)
 
   # 3. Aplicar el ranking al vector de grados.
   # Se extraen los valores de 'vectorGrados' siguiendo estrictamente el orden espectral obtenido.
@@ -257,7 +259,7 @@ graficarRankingVertices <- function(g, ev) {
     labs(
       title = sprintf("Correlación Grado del Vertice segun Espectro (n=%d)", length(gradosRanking)),
       subtitle = "Vértices ordenados descendentemente por coordenada asociada en el Vector Propio",
-      x = "Vertices Ordenados por Ranking Espectral en v2",
+      x = "Vertices Ordenados por Ranking en v2",
       y = "Grado del Vértice"
     ) +
     # Permitimos que ggplot calcule los saltos del eje X dinámicamente para evitar superposición de texto

@@ -723,7 +723,7 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 
 
 
-## Verificacion
+## Verificacion - Ranking Espectral
 
 ¿Como puedo verificar que tengo los vertices del clique?
 
@@ -731,8 +731,8 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 #| label: espectro-eigenvector
 #| fig.height: 4
 
-n = 800
-k = 3 * ceiling(sqrt(n))
+n = 1000
+k = 4 * ceiling(sqrt(n))
 g = n |> conexiones() |> implantar(k) |> grafo()
 A = adyacencia(g)
 eig <- propios(A)
@@ -752,7 +752,7 @@ graficarRankingVertices(g, v2)
 
 
 
-## Verificacion 2 - El grafico de Manuel
+## Verificacion - El grafico de Manuel
 
 ```{r}
 #| label: suma-por-columnas-de-A-segun-clique
