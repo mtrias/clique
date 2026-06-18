@@ -763,11 +763,11 @@ graficarRankingVertices(g, v2)
 
 ```{r}
 #| label: suma-por-columnas-de-A-segun-clique
-#| fig.width: 22
-#| fig.height: 5.5
+#| fig.height: 2.8
+#| fig.width: 11
 
 n = 1000
-k = 4 * ceiling(sqrt(n))
+k = 100
 g = n |> conexiones() |> implantar(k, TRUE) |> grafo()
 A = adyacencia(g)
 eig <- propios(A)
@@ -782,10 +782,16 @@ filasEnClique <- A[node_indices, ]
 filasNoEnClique <- A[-node_indices, ]
 
 #graficarSumaConexiones(colSums(A), "TODA A")
-graficarSumaConexiones(colSums(filasEnClique), "DENTRO del clique")
-graficarSumaConexiones(colSums(filasNoEnClique), "FUERA del clique")
+graficarSumaConexiones(colSums(filasEnClique), "DENTRO del clique", k/2, "k/2")
+graficarSumaConexiones(colSums(filasNoEnClique), "FUERA del clique", (n-k)/2, "(n-k)/2")
 ```
+<code> n=`r n` k=`r k` </code>
 
+::: {.notes}
+- `r k` / 2 = `r k/2`
+- `r n` - `r k` = `r n-k`
+- (`r n` - `r k`) / 2 = `r (n-k)/2`
+:::
 
 ## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true" data-preload="false"}
 

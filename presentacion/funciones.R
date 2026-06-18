@@ -132,13 +132,48 @@ imprimirDistribucionGrados <- function(grafo, extraTitle="") {
     )
 }
 
-graficarSumaConexiones <- function(data, info) {
-  df <- data.frame(Nodo = 1:n, Suma = data)
+graficarSumaConexiones <- function(data, info, valor_linea, texto_linea) {
+  df <- data.frame(Nodo = 1:length(data), Suma = data)
+  RED="#D66"
+  TEXT_SIZE = 15
+  fondo_con_alfa <- scales::alpha("white", .6)
+
   ggplot(df, aes(x = Nodo, y = Suma)) +
     geom_point(
       fill = COLOR,
       color = COLOR,
-      size = 3,
+      size = 1.5
+    ) +
+    # Línea horizontal
+    geom_hline(
+      yintercept = valor_linea,
+      color = RED,
+      linewidth = 2.5
+    ) +
+    # Fondo semitransparente
+    annotate(
+      geom = "label",
+      x = max(df$Nodo) * .9,
+      y = valor_linea -10,
+      label = texto_linea, # Estrictamente necesario para que 'grid' calcule el área del polígono
+      fill = "white",
+      alpha = .6, # Aplicación del canal alfa globalmente a la capa
+      color = NA, # el texto no se renderiza. solo se usa para calcular el tamaño de la caja
+      vjust = -0.5,
+      size = TEXT_SIZE,
+      label.size = NA
+    ) +
+    # Texto opaco sobre la línea
+    annotate(
+      geom = "label",
+      x = max(df$Nodo) * .9,
+      y = valor_linea -10,
+      label = texto_linea,
+      color = RED, # Color de fuente de la etiqueta
+      fill = NA,
+      vjust = -0.5,
+      size = TEXT_SIZE,
+      label.size = NA
     ) +
     theme_minimal() +
     labs(
