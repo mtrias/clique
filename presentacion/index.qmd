@@ -390,7 +390,7 @@ Roughgarden, p16
 <br/><br/>
 
 Roughgarden, p16
-: El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2*log_2{n}$
+: El tamaño $k_m$ del clique máximo de un grafo aleatorio es muy probablemente $≈2\log_2{n}$
 <br/><br/>
 
 Conclusion
@@ -445,6 +445,10 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ::: {.columns}
 ::: {.column width="75%"}
 ![](cotas.png)
+```{r}
+# Fuente: https://www.geogebra.org/graphing/ew6nbcfg
+```
+
 :::
 
 ```{r}
