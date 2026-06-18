@@ -751,6 +751,47 @@ graficarRankingVertices(g, v2)
 
 
 
+
+## Verificacion 2 - El grafico de Manuel
+
+```{r}
+#| label: suma-por-columnas-de-A-segun-clique
+#| fig.width: 22
+#| fig.height: 4
+
+n = 1000
+k = 4 * ceiling(sqrt(n))
+g = n |> conexiones() |> implantar(k, TRUE) |> grafo()
+A = adyacencia(g)
+eig <- propios(A)
+v1 <- eig$vectors[, 1]
+v2 <- eig$vectors[, 2]
+
+# Vertices del clique
+node_indices <- order(abs(v2), decreasing = TRUE)[1:k]
+
+# Me quedo con las filas de nodos que estan en el clique
+filasEnClique <- A[node_indices, ]
+filasNoEnClique <- A[-node_indices, ]
+
+graficarSumaConexiones <- function(data, info) {
+  df <- data.frame(Nodo = 1:n, Suma = data)
+  ggplot(df, aes(x = Nodo, y = Suma)) + 
+    geom_point() +
+    theme_minimal() +
+    labs(
+      x = element_blank(),
+      y = element_blank(),
+      title = sprintf("Suma de conexiones en %s", info)
+    )
+}
+
+graficarSumaConexiones(colSums(A), "TODA A")
+graficarSumaConexiones(colSums(filasEnClique), "filas DENTRO del clique")
+graficarSumaConexiones(colSums(filasNoEnClique), "filas FUERA del clique")
+```
+
+
 ## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true" data-preload="false"}
 
 
