@@ -805,10 +805,3 @@ Lei, J., Rinaldo, A., et al. (2015). Consistency of spectral clustering in stoch
 
 Lugosi, G. (2017). Lectures on combinatorial statistics. 47th Probability Summer School, Saint-Flour, pages 1–91.
 
-```{r}
-## Diagnostico
-#summary(grados)
-#cat("Número de nodos:", vcount(ger), "\n")
-#cat("Número de aristas:", ecount(ger), "\n")
-```
-

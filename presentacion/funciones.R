@@ -5,6 +5,11 @@ CONX_GRAFO_SIMPLE        <- c(1,3, 1,5, 2,4, 3,6, 4,5, 5,6)
 
 COLOR = "#36499d" #116699
 
+## Diagnostico
+#summary(grados)
+#cat("Número de nodos:", vcount(ger), "\n")
+#cat("Número de aristas:", ecount(ger), "\n")
+
 # Fachada para construir grafos de igraph
 grafo <- function(conexiones) {
 
