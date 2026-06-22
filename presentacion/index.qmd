@@ -7,9 +7,13 @@ format:
     css: styles.css
     slide-number: true
     preload-iframes: false
-    default-timing: 3500
+    default-timing: 89 # 40*60 / (28-1) (no cuento slide referencias)
     multiplex:
       url: "https://multiplex.up.railway.app/"
+title-slide-attributes:
+  data-visibility: uncounted
+execute:
+  cache: true
 ---
 
 ```{r}
@@ -799,7 +803,7 @@ graficarSumaConexiones(colSums(filasNoEnClique), "FUERA del clique", (n-k)/2, "(
 
 
 
-## Referencias
+## Referencias {visibility="uncounted"}
 
 Manuel H. (2021). Detección de un k-subgrafo denso en un grafo aleatorio. https://www.fcea.udelar.edu.uy/institucional/agenda/5385-seminario-del-iesta-3.html
 
