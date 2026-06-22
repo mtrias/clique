@@ -83,7 +83,7 @@ imprimirGrafo(g)
 :::
 
 ::: {.notes}
-- Breve intro a grafos (si alguien la necesita)
+- Breve intro grafos (necesaria?)
 - No direccionado
 - Sin loops (i != j)
 - Concepto: orden de un nodo
@@ -145,7 +145,7 @@ imprimirGrafo(g)
 ```
 
 ::: {.notes}
-- Comunidad / Pandilla
+- Comunidad
 - Subgrafo Completo Maximal
 - Si:(2,3,5,6) No:(1,4,7)
 - Ojo: Maximal $\neq$ Maximo
@@ -447,14 +447,14 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ## Ganó Alon
 
 ::: {.columns}
-::: {.column width="75%"}
+::: {.column width="70%"}
 
 ![](cotas.png)
 
 <small>Fuente: [Geogebra](https://www.geogebra.org/graphing/ew6nbcfg)</small>
 
 :::
-::: {.column width="25%"}
+::: {.column width="30%"}
 ```{r}
 n <- 1000
 ```
@@ -513,9 +513,10 @@ $$
 Señal + Perturbacion: $A = E(A) + P$
 
 ::: {.notes}
-- La diagonal deberian ser 0 pero eso no cambia el resultado
-- Grado esperado de cualquier vertice es n-1 / 2
-- n=1000 => √n ~31
+- Diagonal deberian ser 0 (no cambia el resultado)
+- Grado esperado de vertices (n-1) / 2
+- Grado es la suma de la fila o columna
+- Matriz de rango 1
 :::
 
 
@@ -557,6 +558,9 @@ Simetrica $\implies$
 - $\lambda_i \in \mathbb{R}$
 - Autovectores Ortogonales
 
+::: {.notes}
+- Teorema Espectral
+:::
 
 
 
@@ -573,7 +577,7 @@ Simetrica $\implies$
 & \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) = n/2 \\
 & E(A) \cdot \ones = \frac{n}{2} \ones \\
 \\
-& u_1 = \ones \qquad \lambda_1 = \frac{n}{2}
+& v_1 = \ones \qquad \lambda_1 = \frac{n}{2}
 \end{align}
 :::
 
