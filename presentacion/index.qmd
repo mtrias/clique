@@ -642,61 +642,6 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 
 
-## Decaimiento Espectral
-
-```{r}
-#| label: espectro-de-adyacencia
-#| fig.width: 11
-#| fig.height: 3
-
-n = 1000
-k = 150
-n |> conexiones() |> grafo() |> adyacencia() |> graficarEspectro()
-n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro(sprintf("(k=%s)", k))
-```
-
-::: {.notes}
-- hay mas valores propios (significativos)? -> No
-:::
-
-
-
-## ¿Que pasa de acuerdo a $k$ ?
-```{r}
-n  = 1000
-rg = ceiling( 2 * log2(n) )        # Roughgarden, limite indistinguible
-al = ceiling( sqrt(n) )            # Alon, Limite de efectividad de algoritmo espectral
-kc = ceiling( sqrt(n * log10(n)) ) # Kucera, limite de trivialidad
-```
-
-| $n=1000$           | $\lambda_1 = n/2$   | $\lambda_2 = k/2$   | Clique                |
-|--------------------|---------------------|---------------------|-----------------------|
-| $k<`r rg`$         |                     |                     | Indistinguible        |
-| $k<`r al`$         |                     |                     | No funciona Alon      |
-| $`r al`<k<`r kc`$  | `Ruido`             | `Clique` en $v_2$   | Alg. Espectral <small>(Alon)</small> |
-| $k<`r n/2`$        |                     |                     | Trivial <small>(Kucera)</small>      |
-| $k>`r n/2`$        | `Clique` en $v1$    | `Ruido`             |                       |
-
-::: {.notes}
-- para k grande, no necesitamos tecnicas espectrales
-- para k>n/2 el clique se desplaza al autovector principal $v1$
-:::
-
-```{r}
-# Saco la primer columna porque no entra, y quizas no es necesaria
-#| $k$                  
-#|----------------------
-#| $< 2\log_2 n$        
-#| $< \sqrt n$          
-#| $< \sqrt{n*log(n)}$  
-#| $< n/2$              
-#| $> n/2$              
-```
-
-
-
-
-
 ## Davis-Kahan
 
 La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del _"eigengap"_
@@ -734,6 +679,27 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 ::: {.notes}
 - Algoritmo en realidad (recuperacion exacta)
 - Q = {i ∈ V : i tiene al menos 3k/4 vecinos en U}.
+:::
+
+
+
+
+
+## Decaimiento Espectral
+
+```{r}
+#| label: espectro-de-adyacencia
+#| fig.width: 11
+#| fig.height: 3
+
+n = 1000
+k = 150
+n |> conexiones() |> grafo() |> adyacencia() |> graficarEspectro()
+n |> conexiones() |> implantar(k) |> grafo() |> adyacencia() |> graficarEspectro(sprintf("(k=%s)", k))
+```
+
+::: {.notes}
+- hay mas valores propios (significativos)? -> No
 :::
 
 
@@ -804,6 +770,42 @@ graficarSumaConexiones(colSums(filasNoEnClique), "FUERA del clique", (n-k)/2, "(
 :::
 
 ## {background-iframe="https://miguel-trias.shinyapps.io/clique/" background-interactive="true" data-preload="false"}
+
+
+
+
+
+## ¿Que pasa de acuerdo a $k$ ? {visibility="uncounted"}
+```{r}
+n  = 1000
+rg = ceiling( 2 * log2(n) )        # Roughgarden, limite indistinguible
+al = ceiling( sqrt(n) )            # Alon, Limite de efectividad de algoritmo espectral
+kc = ceiling( sqrt(n * log10(n)) ) # Kucera, limite de trivialidad
+```
+
+| $n=1000$           | $\lambda_1 = n/2$   | $\lambda_2 = k/2$   | Clique                |
+|--------------------|---------------------|---------------------|-----------------------|
+| $k<`r rg`$         |                     |                     | Indistinguible        |
+| $k<`r al`$         |                     |                     | No funciona Alon      |
+| $`r al`<k<`r kc`$  | `Ruido`             | `Clique` en $v_2$   | Alg. Espectral <small>(Alon)</small> |
+| $k<`r n/2`$        |                     |                     | Trivial <small>(Kucera)</small>      |
+| $k>`r n/2`$        | `Clique` en $v1$    | `Ruido`             |                       |
+
+::: {.notes}
+- para k grande, no necesitamos tecnicas espectrales
+- para k>n/2 el clique se desplaza al autovector principal $v1$
+:::
+
+```{r}
+# Saco la primer columna porque no entra, y quizas no es necesaria
+#| $k$                  
+#|----------------------
+#| $< 2\log_2 n$        
+#| $< \sqrt n$          
+#| $< \sqrt{n*log(n)}$  
+#| $< n/2$              
+#| $> n/2$              
+```
 
 
 
