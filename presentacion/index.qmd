@@ -212,7 +212,7 @@ A <- adyacencia(g)
 # Esto lo hago porque, a pesar de que ambos grafos son topologicamente identicos, cambiar el nombre de los vertices afecta el layout fisico de igraph.
 # En esta slide quiero imprimir exactamente el mismo grafo, pero con labels distintos para mostrar como ese reordenamiento trivial hace el clique visible en la matriz de adyacencia
 # La trampa entonces, es imprimir el mismo grafo pero con labels distintos, lo cual lo hace coincidir con la matriz de adyacencia que se imprime en la otra columna
-# Observar que en el grafo de clique en posicion "trivial" solamente se cambia el nodo 4 por el 6
+# Observar que en el grafo de clique en posicion "trivial" solamente se intercambian los nodos 4 y 6
 g <- grafo(CONX_CLIQUE_ALEATORIO)
 imprimirGrafo(g, labels=c("1","2","3","6","5","4","7","8"))
 ```
@@ -232,7 +232,6 @@ imprimirAdyacencia(A)
 ::: {.notes}
 - No se ve a menos que reordenemos columnas
 - Solamente se cambia el nodo 4 por el 6
-- Observar que el clique es informacion de rango 1
 :::
 
 
@@ -379,8 +378,8 @@ conx |> implantar(k, FALSE) |> grafo() |> adyacencia() |> imprimirAdyacencia("po
 ::: {.notes}
 - Como se ve el clique?
 - Depende de p, k y n
-- k muy grande, altera la "estructura base", la señal ahora no tiene ruido aleatorio, sino que es puro clique.
-- Estamos interesados en ciertos k y n que hacen factible encontrar una solucion
+- k muy grande, poco ruido aleatorio, mucho clique.
+- Nos interesan ciertos k y n que hacen factible encontrar una solucion
 :::
 
 
@@ -514,10 +513,10 @@ E(A) = \begin{pmatrix}
 $$
 
 ::: {.notes}
-- Diagonal deberian ser 0 (no cambia el resultado)
-- Grado esperado de vertices ≈ n / 2
 - Grado es la suma de la fila o columna
+- Grado esperado de vertices ≈ n / 2
 - Matriz de rango 1
+- Diagonal deberian ser 0 (no cambia el resultado)
 :::
 
 
@@ -637,8 +636,7 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 :::
 
 ::: {.notes}
-- w es autovector (no nulo)
-- sus coordenadas suman 0 => tiene (+) y (-)
+- coordenadas suman 0 => tiene (+) y (-)
 - Solucion trivial: un valor para (+), otro para (-)
 - (+) en coords del clique, (-) en el resto
 - Para que la suma de cero, todos los otros valores deben ser negativos.
@@ -680,7 +678,7 @@ Pero el analisis espectral vale igual
 
 ::: {.notes}
 1. Teoria de Perturbaciones
-2. Se pueden calcular los autovectores reales y comprobar que son parecidos
+2. Se pueden calcular los autovalores y autovectores reales y comprobar que son parecidos
 3. Se puede aplicar el algoritmo y comprobar que funciona.
 :::
 
