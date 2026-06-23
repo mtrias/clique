@@ -7,13 +7,11 @@ format:
     css: styles.css
     slide-number: true
     preload-iframes: false
-    # 40*60 / 25
+    # 40*60 / 26
     # No cuento algunas slides opcionales. Buscar "uncounted"
-    default-timing: 96
+    default-timing: 92
     multiplex:
       url: "https://multiplex.up.railway.app/"
-title-slide-attributes:
-  data-visibility: uncounted
 execute:
   cache: true
 ---
@@ -125,6 +123,7 @@ imprimirGrafo(g)
 ::: {.notes}
 - Simetrica
 - a_ii = 0
+- Grado de nodo = ∑ fila
 :::
 
 
@@ -435,7 +434,7 @@ n |> conexiones() |> implantar(k2, FALSE) |> grafo() |> imprimirDistribucionGrad
 ```
 
 ::: {.notes}
-- "Si se planta un clique (k), esperamos que los vertices que lo conforman, incrementen su grado en k-1/2"
+- "Si se planta un clique (k), esperamos que los vertices que lo conforman, incrementen su grado en (k-1)/2"
 - cada vertice tiene que conectarse con otros k − 1 pero en promedio la mitad de esas conexiones ya estaban presentes.
 - Grados fuera del clique ~Bin(n-1, 1/2)
 - ancho distribucion √(n log n) (TLC)
@@ -503,21 +502,20 @@ sqrt(n)
 Algoritmo de clustering espectral. Asegura una deteccion exacta en tiempo polinomial si $k = \Omega(\sqrt n)$
 <br>
 
-Sea $A$ la matriz de adyacencia de $\ger{n}$
+Sea $A$ la matriz de adyacencia de $\ger[p=\half]{n}$
 
 $$
 E(A) = \begin{pmatrix}
-\half & \dots & \half \\
-\vdots & \ddots & \vdots \\
-\half & \dots & \half
+\half  & \dots  & \dots  & \half \\
+\vdots & \ddots &        & \vdots \\
+\vdots &        & \ddots & \vdots \\
+\half  & \dots  & \dots  & \half
 \end{pmatrix}
 $$
 
-Señal + Perturbacion: $A = E(A) + P$
-
 ::: {.notes}
 - Diagonal deberian ser 0 (no cambia el resultado)
-- Grado esperado de vertices (n-1) / 2
+- Grado esperado de vertices ≈ n / 2
 - Grado es la suma de la fila o columna
 - Matriz de rango 1
 :::
@@ -528,18 +526,28 @@ Señal + Perturbacion: $A = E(A) + P$
 
 ## Alon 1998
 
-¿Como cambia $E(A)$ si implanto un clique de tamaño $k$? 
+::: {.columns}
+::: {.column width="75%"}
+¿Como cambia $E(A)$ si implanto un clique de tamaño $k$?
 
 $$
 E(A) = \begin{pmatrix}
-1      & \dots  & 1      & \half  & \dots & \half  \\
-\vdots & \ddots & \vdots & \vdots &       & \vdots \\
-1      & \dots  & 1      & \half  & \dots & \half  \\
-\half  & \dots  & \half  & \half  & \dots & \half  \\
-\vdots & \ddots & \vdots & \vdots & \ddots & \half  \\
-\half  & \dots  & \half  & \half  & \dots & \half  \\
+1      & \dots  & 1      & \half  & \dots  & \dots  & \half  \\
+\vdots & \ddots & \vdots & \vdots &        &        & \vdots \\
+1      & \dots  & 1      & \half  & \dots  & \dots  & \half  \\
+\half  & \dots  & \half  & \half  & \dots  & \dots  & \half  \\
+\vdots &        & \vdots & \vdots & \ddots &        & \half  \\
+\vdots &        & \vdots & \vdots &        & \ddots & \half  \\
+\half  & \dots  & \half  & \half  & \dots  & \dots  & \half  \\
 \end{pmatrix}
 $$
+:::
+
+::: {.column width="25%"}
+Realizacion =<br/><small>Señal + Perturbacion:</small>
+$$A = E(A) + P$$
+:::
+:::
 
 ::: {.notes}
 - Rango 2 => 2 autovalores ≠ 0
@@ -577,8 +585,8 @@ Simetrica $\implies$
 \begin{align}
 & \ones = (1, \dots, 1)^\top \\ 
 \\
-& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) = n/2 \\
-& E(A) \cdot \ones = \frac{n}{2} \ones \\
+& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
+& E(A) \cdot \ones \approx \frac{n}{2} \ones \\
 \\
 & v_1 = \ones \qquad \lambda_1 = \frac{n}{2}
 \end{align}
@@ -610,7 +618,7 @@ Entonces, el vector de unos es un $\approx$ autovector.
 & v_1 \perp v_2 \\
 & 0 = \langle v_1, v_2 \rangle = v_1^\top v_2 =  \sum_i (v_1)_i \cdot (v_2)_i = \sum_i (v_2)_i \\
 \\
-&w = (n-k, \dots, n-k, \quad -k, \dots, -k) \\
+&w = \left( n-k, \dots, n-k, \quad -k, \dots, \dots, \dots, -k \right) \\
 &\sum_i w_i = 0 \\
 &E(A)\cdot w = \left( \half(n-k)k,\dots,\half(n-k)k,0,\dots,0 \right) \\
 &E(A) \cdot w \approx \frac{k}{2} w \\
@@ -661,26 +669,37 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 
 
 
-## Davis-Kahan
+## Es valido el analisis de $E(A)$?
+Si. 
 
-La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del _"eigengap"_
-
-$$\sin\theta_i \leq \frac{2\|P\|}{min_{j\neq i}|\lambda_i-\lambda_j|}$$
-
-
-$A$ es una realizacion de $E(A)$ pero el analisis espectral vale igual
+$A$ es una realizacion de $E(A)$ 
 
 $A = E(A) + P$
+
+Pero el analisis espectral vale igual
+
+::: {.notes}
+1. Teoria de Perturbaciones
+2. Se pueden calcular los autovectores reales y comprobar que son parecidos
+3. Se puede aplicar el algoritmo y comprobar que funciona.
+:::
+
+
+
+
+
+## Davis-Kahan
+
+La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud de la perturbacion y del _"eigengap"_
+
+$$\sin\theta_i \leq \frac{2\|P\|}{min_{j\neq i}|\lambda_i-\lambda_j|}$$
+<br/>
+Conclusion: La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector $v_2$
 
 ::: {.notes}
 - Si el ruido es pequeño y el salto entre autovalores (el eigengap) es grande, el autovector sigue apuntando a la "verdadera" señal
 - Vinculacion con Wigner (cota autovalores luego del principal < √n)
 - sin θ <= 4√n / k
-- Por que vale este analisis de E(A) en A?
-1. Teoria de Perturbaciones
-2. sin θ acotado => La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
-3. Se pueden calcular los autovectores reales y comprobar que son parecidos
-4. Se puede aplicar el algoritmo y comprobar que funciona.
 :::
 
 
