@@ -584,7 +584,7 @@ Simetrica $\implies$
 \begin{align}
 & \ones = (1, \dots, 1)^\top \\ 
 \\
-& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
+& \left( E(A) \cdot \ones \right)_j = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
 & E(A) \cdot \ones \approx \frac{n}{2} \ones \\
 \\
 & v_1 = \ones \qquad \lambda_1 = \frac{n}{2}
@@ -667,7 +667,7 @@ Sea $A$ la matriz de adyacencia de $\ger{n}$
 
 
 
-## Es valido el analisis de $E(A)$?
+## ¿Es valido el analisis de $E(A)$?
 Si. 
 
 $A$ es una realizacion de $E(A)$ 
