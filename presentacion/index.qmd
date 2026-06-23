@@ -262,7 +262,8 @@ $$ A = \matrizAdySimple $$
 - cada nodo es un activo financiero
 - correlacion de activos como objetivo
 - $\theta$ frontera aceptable de correlacion => Matriz de ceros y unos
-- Problema NP. solución basada en el álgebra lineal espectral. En lugar de analizar la red nodo por nodo, analizamos el expectro
+- Problema NP. Analizar la red nodo por nodo no garantiza encontrar sol. rapido
+- Buscamos solución basada en álgebra lineal espectral.
 :::
 
 
@@ -627,8 +628,9 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 ::: {.notes}
 - w es autovector (no nulo)
-- pero a la vez sus coordenadas suman 0
-- Elijo solucion trivial: valor positivo para las coordenadas del clique, negativo en el resto
+- sus coordenadas suman 0 => tiene (+) y (-)
+- Solucion trivial: un valor para (+), otro para (-)
+- (+) en coords del clique, (-) en el resto
 - Para que la suma de cero, todos los otros valores deben ser negativos.
 - No necesitan ser gigantes porque hay muchos mas nodos fuera del clique $(n-k)$ que dentro de el, pero empuja los coeficientes del clique hacia los positivos.
 
@@ -754,7 +756,7 @@ eig <- propios(A)
 v1 <- eig$vectors[, 1]
 v2 <- eig$vectors[, 2]
 
-graficarRankingVertices(g, v2)
+graficarRankingVertices(g, v2, k)
 ```
 
 ::: {.notes}

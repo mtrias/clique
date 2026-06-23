@@ -273,13 +273,13 @@ rankingVertices <- function(g, ev) {
   return(gradosOrdenados)
 }
 
-# Visualizar la relación entre la centralidad espectral y el grado del vértice
-graficarRankingVertices <- function(g, ev) {
+# Visualizar la relación entre el espectro y el grado del vértice
+graficarRankingVertices <- function(g, ev, k) {
 
-  # 1. Obtener el vector de grados ordenado algebraicamente llamando a la función anterior.
+  # Obtener el vector de grados ordenado llamando a la función anterior.
   gradosRanking <- rankingVertices(g, ev)
 
-  # 2. Estructurar los datos en un data.frame requerido por la gramática de ggplot2.
+  # Estructurar los datos en un data.frame requerido por la gramática de ggplot2.
   # 'Indice' representa la posición en el ranking espectral (eje X).
   # 'Grado' representa el número real de conexiones de ese vértice (eje Y).
   df_ranking <- data.frame(
@@ -287,18 +287,16 @@ graficarRankingVertices <- function(g, ev) {
     Grado = gradosRanking
   )
 
-  # 3. Construir el objeto gráfico subyacente.
-  # Se utiliza geom_line() para visualizar la tendencia matemática global de la red.
   # Si el grafo sigue una topología de ley de potencias (redes libres de escala) o tiene un clique
-  # fuertemente conectado, la línea mostrará una caída logarítmica o escalonada pronunciada.
+  # fuertemente conectado, la tendencia mostrará una caída logarítmica o escalonada pronunciada.
   p <- ggplot(df_ranking, aes(x = Indice, y = Grado)) +
     geom_point(
       color = COLOR,
       linewidth = .5
     ) +
     labs(
-      title = sprintf("Correlación Grado del Vertice segun Espectro (n=%d)", length(gradosRanking)),
-      subtitle = "Vértices ordenados descendentemente por coordenada asociada en el Vector Propio",
+      title = sprintf("Correlación entre Grado del Vertice y Espectro (n=%d) (k=%d)", length(gradosRanking), k),
+      subtitle = "Vértices ordenados descendentemente por coordenada asociada en el segundo autovector",
       x = "Vertices Ordenados por Ranking en v2",
       y = "Grado del Vértice"
     ) +
@@ -306,11 +304,10 @@ graficarRankingVertices <- function(g, ev) {
     scale_x_continuous(n.breaks = 10) +
     theme_minimal() +
     theme(
-      panel.grid.minor = element_blank(), # Limpia el ruido visual de las líneas fraccionales
+      panel.grid.minor = element_blank(),
       plot.title = element_text(face = "bold")
     )
 
-  # 4. Renderizar el gráfico en el dispositivo activo.
   print(p)
 }
 
