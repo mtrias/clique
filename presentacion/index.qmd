@@ -642,6 +642,23 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 
 
+## Algoritmo
+
+Sea $A$ la matriz de adyacencia de $\ger{n}$
+
+1. Calculamos $v_2$
+2. Ordeno las coordenadas de $v_2$ de mayor a menor
+3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
+
+::: {.notes}
+- Algoritmo en realidad (recuperacion exacta)
+- Q = {i ∈ V : i tiene al menos 3k/4 vecinos en U}.
+:::
+
+
+
+
+
 ## Davis-Kahan
 
 La rotacion de los autovectores de $E(A)$ luego de la Perturbacion $P$ depende de la magnitud del ruido y del _"eigengap"_
@@ -662,23 +679,6 @@ $A = E(A) + P$
 2. sin θ acotado => La rotación de autovectores es tan pequeña que la gran mayoría de los nodos del clique se mantienen en las posiciones superiores del autovector v_2
 3. Se pueden calcular los autovectores reales y comprobar que son parecidos
 4. Se puede aplicar el algoritmo y comprobar que funciona.
-:::
-
-
-
-
-
-## Algoritmo
-
-Sea $A$ la matriz de adyacencia de $\ger{n}$
-
-1. Calculamos $v_2$
-2. Ordeno las coordenadas de $v_2$ de mayor a menor
-3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
-
-::: {.notes}
-- Algoritmo en realidad (recuperacion exacta)
-- Q = {i ∈ V : i tiene al menos 3k/4 vecinos en U}.
 :::
 
 
