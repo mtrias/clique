@@ -294,7 +294,7 @@ $$ A = \matrizAdySimple $$
 
 
 
-## Matriz de Adyacencia de un $\ger{n}$ {.centrado}
+## Matriz de Adyacencia de un $\ger[\half]{n}$ {.centrado}
 
 ```{r}
 #| label: fig-adyacencia-ger-np
@@ -584,7 +584,7 @@ Simetrica $\implies$
 \begin{align}
 & \ones = (1, \dots, 1)^\top \\ 
 \\
-& \left( E(A) \cdot \ones \right)_j = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
+& \left( E(A) \cdot \ones \right)_i = \sum_j E(A)_{ij} = grado(i) \approx n/2 \\
 & E(A) \cdot \ones \approx \frac{n}{2} \ones \\
 \\
 & v_1 = \ones \qquad \lambda_1 = \frac{n}{2}
@@ -650,13 +650,12 @@ $v_2$ asigna valores grandes a los $k$ vertices del clique.
 
 
 
-## Algoritmo
+## Algoritmo para $\ger[\half]{n}$
 
-Sea $A$ la matriz de adyacencia de $\ger{n}$
-
-1. Calculamos $v_2$
-2. Ordeno las coordenadas de $v_2$ de mayor a menor
-3. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
+1. Hallamos la matriz de adyacencia $A$
+2. Calculamos $v_2$
+3. Ordeno las coordenadas de $v_2$ de mayor a menor
+4. Los primeros $k$ coeficientes deberian ser los correspondientes a los vertices del clique
 
 ::: {.notes}
 - Algoritmo en realidad (recuperacion exacta)
