@@ -1,16 +1,5 @@
 ::: {.hidden}
 $$
-\newcommand{\matrizAdySimple}{
-  \begin{pmatrix}
-    0 & 0 & 1 & 0 & 1 & 1 \\
-    0 & 0 & 0 & 1 & 0 & 0 \\
-    1 & 0 & 0 & 0 & 1 & 1 \\
-    0 & 1 & 0 & 0 & 1 & 0 \\
-    1 & 0 & 1 & 1 & 0 & 1 \\
-    1 & 0 & 1 & 0 & 1 & 0
-  \end{pmatrix}
-}
-
 \newcommand{\ger}[2][p]{ \mathcal{G}(#2, #1) }
 
 \newcommand{\half}{ ½ }
