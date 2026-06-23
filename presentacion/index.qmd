@@ -7,7 +7,9 @@ format:
     css: styles.css
     slide-number: true
     preload-iframes: false
-    default-timing: 89 # 40*60 / (28-1) (no cuento slide referencias)
+    # 40*60 / 25
+    # No cuento algunas slides opcionales. Buscar "uncounted"
+    default-timing: 96
     multiplex:
       url: "https://multiplex.up.railway.app/"
 title-slide-attributes:
